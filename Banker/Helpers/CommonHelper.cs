@@ -195,7 +195,7 @@ namespace Banker.Helpers
 
             HistoryViewModel obj = new HistoryViewModel
             {
-                historyList = historyList
+                HistoryList = historyList
             };
 
             return obj;

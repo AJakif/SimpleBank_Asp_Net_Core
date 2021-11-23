@@ -12,7 +12,7 @@ namespace Banker.Models.ViewModels
         public int UserId { get; set; }
         public DateTime DateTime { get; set; }
 
-        public List<HistoryViewModel> historyList { get; set; }
+        public List<HistoryViewModel> HistoryList { get; set; }
 
     }
 }

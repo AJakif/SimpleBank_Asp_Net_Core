@@ -40,6 +40,7 @@ namespace Banker.Controllers
             }
             else
             {
+                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login","Account");
             }
             
@@ -55,6 +56,7 @@ namespace Banker.Controllers
             }
             else
             {
+                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -79,6 +81,7 @@ namespace Banker.Controllers
                     return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
                 }
             }
+            ViewBag.Error = "Error while withdraw, please try again!";
             return View();
         }
 
@@ -92,6 +95,7 @@ namespace Banker.Controllers
             }
             else
             {
+                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -116,6 +120,7 @@ namespace Banker.Controllers
                     return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
                 }
             }
+            ViewBag.Error = "Error while depsit, please try again";
             return View();
         }
     }

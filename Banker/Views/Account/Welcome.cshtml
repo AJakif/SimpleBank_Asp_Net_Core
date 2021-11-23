@@ -6,7 +6,12 @@
 @model Banker.Models.ViewModels.HistoryViewModel
 
 <h1>Welcome</h1>
-
+<div>
+    @if (ViewBag.Success != null)
+    {
+        <span class="text-end alert alert-success">@ViewBag.Error</span>
+    }
+</div>
 <br />
 <div class="border backgroundWhite">
     <div class="row">
@@ -26,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach(var item in Model.historyList)
+            @foreach(var item in Model.HistoryList)
             {
                 
             <tr>

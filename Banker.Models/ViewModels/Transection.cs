@@ -9,6 +9,7 @@ namespace Banker.Models.ViewModels
     {
         [Key]
         public int OId { get; set; }
+
         [Required]
         public int UserId { get; set; }
 
@@ -16,7 +17,7 @@ namespace Banker.Models.ViewModels
         public string Name { get; set; }
         
         [Required]
-
+        [DataType(DataType.DateTime)]
         public DateTime Date { get; set; }
 
         [Required]

@@ -1,11 +1,16 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Balance";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model Banker.Models.ViewModels.CollectData;
 
 <h1 class="display-4">Balance Dashboard</h1>
+<div>
+    @if (ViewBag.Success != null)
+    {
+        <span class="text-end alert alert-success">@ViewBag.Error</span>
+    }
+</div>
 <br />
 <br />
 <div class="row">
@@ -13,7 +18,7 @@
         <label class="control-label form-inline text-right"><b>Balance :</b></label>
     </div>
     <div class="col-sm-2">
-        <input class="form-control disabled form-inline" value="@Model.User.Balance" />
+        <input class="form-control disabled form-inline" value="@Model.User.Balance$" />
     </div>
 </div>
 <br />
@@ -46,31 +51,22 @@
             {
                 @foreach (var trans in Model.Transections)
                 {
-
-
-
-
                     <tr>
                         <td>@trans.Name</td>
                         @if (trans.Type == "Withdraw")
                         {
-                            <td class="text-left"><span style="color:red">- @trans.Amount</span></td>
+                            <td class="text-left"><span style="color:red">- @trans.Amount$</span></td>
                         }
                         @if (trans.Type == "Diposit")
                         {
-                            <td class="text-left"><span style="color: green">+ @trans.Amount</span></td>
+                            <td class="text-left"><span style="color: green">+ @trans.Amount$</span></td>
                         }
                         <td>@trans.Date</td>
                         <td>@trans.Type</td>
                         <td>@trans.Remark</td>
                     </tr>
                 }
-
-
-
             }
-
-
         </tbody>
     </table>
 </div>

@@ -53,6 +53,7 @@ namespace Banker.Controllers
                 return RedirectToAction("Index", "Home"); //Redirects to Home accounts index view
              
             }
+            ViewBag.Error = "Registration Failed, Please Try again!";
             return View();
         }
 
@@ -67,7 +68,7 @@ namespace Banker.Controllers
         {
             if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
             {
-                ViewBag.ErrorMsg = "Email & Password are empty";
+                ViewBag.Error = "Email & Password are empty";
                 return View();
             }
             else
@@ -82,11 +83,12 @@ namespace Banker.Controllers
                     int result = _helper.DMLTransaction(Query);
                     if (result > 0)
                     {
+                        ViewBag.Success = "Login Successful";
                         return RedirectToAction("Welcome");
                     }
                     
                 }
-
+                ViewBag.Error = "There is an error while login, please contact admin";
                 return View();
             }
         }
@@ -111,6 +113,7 @@ namespace Banker.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            ViewBag.Success = "Logout successfull";
             return RedirectToAction("Index","Home");
         }
 

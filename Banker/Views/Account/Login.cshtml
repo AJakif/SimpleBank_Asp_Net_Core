@@ -8,14 +8,15 @@
 <h1>Login</h1>
 
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Login">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div>
-                @if (ViewBag.ErrorMsg != null)
+                @if (ViewBag.Error != null)
                 {
-                    <span class="text-end alert alert-danger">@ViewBag.ErrorMsg</span>
+                    <span class="text-end alert alert-danger">@ViewBag.Error</span>
                 }
             </div>
             <div class="form-group">
