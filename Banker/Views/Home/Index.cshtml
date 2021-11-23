@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@*@model Banker.Models.ViewModels.UserViewModel*@
+
+<div class="text-center">
+    @if (ViewBag.Success != null)
+    {
+        <span class="alert alert-Success">@ViewBag.Success</span>
+
+    }
+    <h1 class="display-4">Welcome</h1>
+    @if (ViewBag.Email != null)
+    {
+        <h3 class="display-4">@ViewBag.Email</h3>
+    }
+    
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

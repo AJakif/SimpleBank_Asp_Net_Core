@@ -1,0 +1,48 @@
+﻿
+@{
+    ViewData["Title"] = "Welcome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Banker.Models.ViewModels.HistoryViewModel
+
+<h1>Welcome</h1>
+
+<br />
+<div class="border backgroundWhite">
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-primary">Login Timeline</h2>
+            <p class="text-danger">Last 20 Logins </p>
+        </div>
+    </div>
+
+    <br />
+    <br />
+    <table id="tblData" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Login Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model.historyList)
+            {
+                
+            <tr>
+                <td>
+                    @ViewBag.Name
+                </td>
+                <td>@item.DateTime</td>
+
+            </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <script src="~/js/Login.js"></script>
+}

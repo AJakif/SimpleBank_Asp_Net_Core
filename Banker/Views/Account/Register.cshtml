@@ -1,0 +1,76 @@
+﻿@model Banker.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Register</h1>
+<hr />
+<div class="row">
+    <div class="col-md-9">
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div>
+                @if (ViewBag.Error != null)
+                {
+                    <span class="text-end alert alert-danger">@ViewBag.Error</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label><span style="color:red">*</span>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label control-label" asp-for="Gender" ></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" asp-for="Gender" type="checkbox" id="inlineCheckbox1" value="Male">
+                        <label class="form-check-label" for="inlineCheckbox1">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" asp-for="Gender" type="checkbox" id="inlineCheckbox2" value="Female">
+                        <label class="form-check-label" for="inlineCheckbox2">Female</label>
+                    </div>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Phone" class="control-label"></label><span style="color:red">*</span>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label><span style="color:red">*</span>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label"></label><span style="color:red">*</span>
+                    <input asp-for="Password" type="password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+</form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

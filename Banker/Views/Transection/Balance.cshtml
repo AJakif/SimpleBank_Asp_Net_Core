@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewData["Title"] = "Balance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Banker.Models.ViewModels.CollectData;
+
+<h1 class="display-4">Balance Dashboard</h1>
+<br />
+<br />
+<div class="row">
+    <div class="col-sm-2">
+        <label class="control-label form-inline text-right"><b>Balance :</b></label>
+    </div>
+    <div class="col-sm-2">
+        <input class="form-control disabled form-inline" value="@Model.User.Balance" />
+    </div>
+</div>
+<br />
+<div class="border backgroundWhite">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-primary text-center">Transaction Table</h2>
+        </div>
+    </div>
+    <br />
+    <br />
+    <table id="tblData" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Transection Date & Time</th>
+                <th>Transection Type</th>
+                <th>Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Transections.Count == 0)
+            {
+                <tr>
+                    <td colspan="5" style="text-align:center">No data</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var trans in Model.Transections)
+                {
+
+
+
+
+                    <tr>
+                        <td>@trans.Name</td>
+                        @if (trans.Type == "Withdraw")
+                        {
+                            <td class="text-left"><span style="color:red">- @trans.Amount</span></td>
+                        }
+                        @if (trans.Type == "Diposit")
+                        {
+                            <td class="text-left"><span style="color: green">+ @trans.Amount</span></td>
+                        }
+                        <td>@trans.Date</td>
+                        <td>@trans.Type</td>
+                        <td>@trans.Remark</td>
+                    </tr>
+                }
+
+
+
+            }
+
+
+        </tbody>
+    </table>
+</div>
