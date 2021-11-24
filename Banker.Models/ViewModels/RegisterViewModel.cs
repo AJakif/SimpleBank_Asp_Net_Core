@@ -8,10 +8,12 @@ namespace Banker.Models.ViewModels
     public class RegisterViewModel
     {
         [Required]
+        [RegularExpression(@"^[a-zA-Z]+[ a-zA-Z-_]*$", ErrorMessage = "Use Characters only")]
         public string Name { get; set; } 
 
 
         public string Address { get; set; }
+
 
         public string Gender { get; set; }
 

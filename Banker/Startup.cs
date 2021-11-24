@@ -71,6 +71,39 @@ namespace Banker
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Registration",
+                    defaults: new { controller = "Account", action = "Register", });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Login",
+                    defaults: new { controller = "Account", action = "Login", });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Home/Dashboard",
+                    defaults: new { controller = "Account", action = "Welcome", });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Home/Balance",
+                    defaults: new { controller = "Transection", action = "Balance", });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Home/Withdraw",
+                    defaults: new { controller = "Transection", action = "Withdraw", });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "Home/Deposit",
+                    defaults: new { controller = "Transection", action = "Deposit", });
+
+
+
                 endpoints.MapRazorPages();
             });
         }

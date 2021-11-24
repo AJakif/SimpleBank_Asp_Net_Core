@@ -13,6 +13,8 @@
     @if (ViewBag.Error != null)
     {
         <span class="text-end alert alert-danger">@ViewBag.Error</span>
+        <br />
+        <br />
     }
 </div>
 <div class="row">
@@ -42,7 +44,7 @@
                 <span asp-validation-for="Remark" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="diposit" class="btn btn-primary" />
+                <input type="submit" value="Deposit" class="btn btn-primary" />
             </div>
         </form>
     </div>

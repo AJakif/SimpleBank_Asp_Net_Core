@@ -25,6 +25,7 @@ namespace Banker.Controllers
         }
 
         [HttpGet]
+        [Route("/Registration")]
         public IActionResult Register()
         {
             return View();
@@ -32,32 +33,40 @@ namespace Banker.Controllers
         [HttpPost]
         public IActionResult Register(RegisterViewModel rvm)
         {
-            string UserExistsQuery = $"Select * from [User] where Name='{rvm.Name}'" + $"OR Email = '{rvm.Email}'"; //Query for user existence
-            bool userExists = _helper.UserAlreadyExists(UserExistsQuery);
-
-            if(userExists == true)
+            try
             {
-                ViewBag.Error = "Name and Email Already Exists";
-                return View();
-            }
-            //if user exists then returns to Account controller and redirects to register view
+                string UserExistsQuery = $"Select * from [User] where Name='{rvm.Name}'" + $"OR Email = '{rvm.Email}'"; //Query for user existence
+                bool userExists = _helper.UserAlreadyExists(UserExistsQuery);
 
-            string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance)" +
-                $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}')";
-            //If user doesn't exists it inserts data into database
-            int result = _helper.DMLTransaction(Query);
-            if (result > 0)
-            {
-                /*EntryIntoSession(rvm.Email);*///Inserts Query into database and stores user name in session
-                ViewBag.Success = "Registration Successful!";
-                return RedirectToAction("Index", "Home"); //Redirects to Home accounts index view
-             
+                if (userExists == true)
+                {
+                    ViewBag.Error = "Name and Email Already Exists";
+                    return View();
+                }
+                //if user exists then returns to Account controller and redirects to register view
+
+                string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance)" +
+                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}')";
+                //If user doesn't exists it inserts data into database
+                int result = _helper.DMLTransaction(Query);
+                if (result > 0)
+                {
+                    /*EntryIntoSession(rvm.Email);*///Inserts Query into database and stores user name in session
+                    ViewBag.Success = "Registration Successful!";
+                    return RedirectToAction("Index", "Home"); //Redirects to Home accounts index view
+
+                }
             }
-            ViewBag.Error = "Registration Failed, Please Try again!";
+            catch
+            {
+                ViewBag.Error = "Registration Failed, Please Try again!";
+                ViewBag.email = HttpContext.Session.GetString("Email");
+            }
             return View();
         }
 
         [HttpGet]
+        [Route("/Login")]
         public IActionResult Login()
         {
             return View();
@@ -66,32 +75,40 @@ namespace Banker.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel lvm)
         {
-            if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
+            try
             {
-                ViewBag.Error = "Email & Password are empty";
-                return View();
-            }
-            else
-            {
-                bool Isfind = SignInMethod(lvm.Email, lvm.Password);
-                if (Isfind == true)
+                if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
                 {
-                    var idStr = HttpContext.Session.GetString("OId");
-                    int id = CommonHelper.ConvertToInt(idStr); //try-catch
-                    var date = DateTime.Now;
-                    string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{id}','{date}')";
-                    int result = _helper.DMLTransaction(Query);
-                    if (result > 0)
-                    {
-                        ViewBag.Success = "Login Successful";
-                        return RedirectToAction("Welcome");
-                    }
-                    
+                    ViewBag.Error = "Email & Password are empty";
+                    return View();
                 }
-                ViewBag.Error = "There is an error while login, please contact admin";
-                return View();
+                else
+                {
+                    bool Isfind = SignInMethod(lvm.Email, lvm.Password);
+                    if (Isfind == true)
+                    {
+                        var idStr = HttpContext.Session.GetString("OId");
+                        int id = CommonHelper.ConvertToInt(idStr); //try-catch
+                        var date = DateTime.Now;
+                        string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{id}','{date}')";
+                        int result = _helper.DMLTransaction(Query);
+                        if (result > 0)
+                        {
+                            return RedirectToAction("Welcome");
+                        }
+
+                    }
+                }
             }
+            catch
+            {
+                ViewBag.Error = "There is an error while login, please contact admin";
+                ViewBag.email = HttpContext.Session.GetString("Email");
+            }  
+                return View();
         }
+
+        [Route("Home/Dashboard")]
         public IActionResult Welcome()
         {
             ViewBag.email = HttpContext.Session.GetString("Email");
@@ -137,7 +154,7 @@ namespace Banker.Controllers
             }
             else
             {
-                ViewBag.ErrorMsg = "Email & Password are wrong";
+                ViewBag.Error = "Email & Password are wrong";
             }
             return flag;
         }

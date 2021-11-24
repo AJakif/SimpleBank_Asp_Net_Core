@@ -9,7 +9,11 @@
 <div>
     @if (ViewBag.Success != null)
     {
-        <span class="text-end alert alert-success">@ViewBag.Error</span>
+        <span class="text-end alert alert-success" role="alert">@ViewBag.Success</span>
+    }
+    @if (ViewBag.Error != null)
+    {
+        <span class="text-end alert alert-danger" role="alert">@ViewBag.Error</span>
     }
 </div>
 <br />
@@ -20,9 +24,6 @@
             <p class="text-danger">Last 20 Logins </p>
         </div>
     </div>
-
-    <br />
-    <br />
     <table id="tblData" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>

@@ -8,17 +8,23 @@
 <div>
     @if (ViewBag.Success != null)
     {
-        <span class="text-end alert alert-success">@ViewBag.Error</span>
+        <span class="text-end alert alert-success" role="alert">@ViewBag.Success</span>
     }
+    @if (ViewBag.Error != null)
+    {
+        <span class="text-end alert alert-danger" role="alert">@ViewBag.Error</span>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <span class="text-end alert alert-success" role="alert">@ViewBag.Success</span>
+    }
+
 </div>
 <br />
 <br />
 <div class="row">
     <div class="col-sm-2">
-        <label class="control-label form-inline text-right"><b>Balance :</b></label>
-    </div>
-    <div class="col-sm-2">
-        <input class="form-control disabled form-inline" value="@Model.User.Balance$" />
+        <b>Balance :</b><input class="form-control disabled form-inline" value="@Model.User.Balance$" />
     </div>
 </div>
 <br />
@@ -28,15 +34,13 @@
             <h2 class="text-primary text-center">Transaction Table</h2>
         </div>
     </div>
-    <br />
-    <br />
     <table id="tblData" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Amount</th>
-                <th>Transection Date & Time</th>
-                <th>Transection Type</th>
+                <th>Transaction Date & Time</th>
+                <th>Transaction Type</th>
                 <th>Remark</th>
             </tr>
         </thead>

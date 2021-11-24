@@ -28,20 +28,18 @@
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label control-label" asp-for="Gender" ></label>
+            
+                    <div class="form-group">
+                        <label asp-for="Gender" class="control-label">Gender</label>
+                        <select class="form-control" asp-for="Gender" name="Gender">
+                            <option ></option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" asp-for="Gender" type="checkbox" id="inlineCheckbox1" value="Male">
-                        <label class="form-check-label" for="inlineCheckbox1">Male</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" asp-for="Gender" type="checkbox" id="inlineCheckbox2" value="Female">
-                        <label class="form-check-label" for="inlineCheckbox2">Female</label>
-                    </div>
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
+                    
+                
                 <div class="form-group">
                     <label asp-for="Phone" class="control-label"></label><span style="color:red">*</span>
                     <input asp-for="Phone" class="form-control" />

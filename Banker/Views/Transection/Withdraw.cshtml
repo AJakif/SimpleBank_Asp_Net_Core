@@ -7,52 +7,55 @@
 
 <h1>Withdraw</h1>
 <hr />
+@if (ViewBag.Error != null)
+{
 <div>
-    @if (ViewBag.Error != null)
-    {
-        <span class="text-end alert alert-danger">@ViewBag.Error</span>
-    }
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Withdraw">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="Name" class="control-label">Withdrawer Name</label><span style="color:red">*</span>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label><span style="color:red">*</span>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Remark" class="control-label">Reason</label><span style="color:red">*</span>
-                <select class="form-control" asp-for="Remark" name="Remark" >
-                    <option>..Please select..</option>
-                    <option value="Medical">Medical</option>
-                    <option value="Grocery">Grocery</option>
-                    <option value="Shoping">Shoping</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Education">Education</option>
-                    <option value="Other">Other</option>
-                </select>
-                <span asp-validation-for="Remark" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Withdraw" class="btn btn-primary" />
-            </div>
-        </form>
+    <span class="text-end alert alert-danger">@ViewBag.Error</span>
+    <br />
+    <br />
+
+</div>
+}    
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Withdraw">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label">Withdrawer Name</label><span style="color:red">*</span>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Amount" class="control-label"></label><span style="color:red">*</span>
+                    <input asp-for="Amount" class="form-control" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Remark" class="control-label">Reason</label><span style="color:red">*</span>
+                    <select class="form-control" asp-for="Remark" name="Remark">
+                        <option>..Please select..</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Grocery">Grocery</option>
+                        <option value="Shoping">Shoping</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Education">Education</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="Remark" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Withdraw" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Balance">Back to Balance</a>
-</div>
+    <div>
+        <a asp-action="Balance">Back to Balance</a>
+    </div>
 
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

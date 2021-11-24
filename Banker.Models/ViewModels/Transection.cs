@@ -14,6 +14,7 @@ namespace Banker.Models.ViewModels
         public int UserId { get; set; }
 
         [Required]
+        [RegularExpression(@"^[a-zA-Z]+[ a-zA-Z-_]*$", ErrorMessage = "Use Characters only")]
         public string Name { get; set; }
         
         [Required]
@@ -24,6 +25,7 @@ namespace Banker.Models.ViewModels
         public double Amount { get; set; }
 
         [Required]
+        [DataType(DataType.Currency)]
         public string Remark { get; set; }
 
         [Required]

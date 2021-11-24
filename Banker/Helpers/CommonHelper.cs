@@ -49,7 +49,7 @@ namespace Banker.Helpers
             return user;
         }
 
-        internal UserViewModel GetUserById(int id)
+        public UserViewModel GetUserById(int id)
         {
             UserViewModel user = new UserViewModel();
 

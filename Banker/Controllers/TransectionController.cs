@@ -24,6 +24,7 @@ namespace Banker.Controllers
         }
 
         [HttpGet]
+        [Route("Home/Balance")]
         public IActionResult Balance()
         {
             ViewBag.email = HttpContext.Session.GetString("Email");
@@ -40,13 +41,13 @@ namespace Banker.Controllers
             }
             else
             {
-                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login","Account");
             }
             
         }
 
         [HttpGet]
+        [Route("Home/Withdraw")]
         public IActionResult Withdraw()
         {
             ViewBag.email = HttpContext.Session.GetString("Email");
@@ -56,7 +57,6 @@ namespace Banker.Controllers
             }
             else
             {
-                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -66,26 +66,56 @@ namespace Banker.Controllers
         {
             var idStr = HttpContext.Session.GetString("OId");
             int id = CommonHelper.ConvertToInt(idStr); //try-catch
-            var date = DateTime.Now;
-            string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type)" +
-                $"values ('{id}','{wtvm.Name}','{date}','{wtvm.Amount}','{wtvm.Remark}','{"Withdraw"}')";
-            //If user doesn't exists it inserts data into database
-            int result = _helper.DMLTransaction(Query);
-            if (result > 0)
+            try
             {
-                string Uquery = $"UPDATE [User] SET Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
-                int Uresult = _helper.DMLTransaction(Uquery);
-                if (Uresult > 0)
+                UserViewModel uvm = new UserViewModel();
+                uvm = _helper.GetUserById(id);
+                if(wtvm.Amount <= 9)
                 {
-                    ViewBag.Success = "Withdraw done successfully";
-                    return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                    ViewBag.Error = "You cannot withdraw less than 10$!";
+                    ViewBag.email = HttpContext.Session.GetString("Email");
+                    return View();
+                }
+                if(wtvm.Amount > uvm.Balance)
+                {
+                    ViewBag.Error = "You cannot withdraw more than your balance!";
+                    ViewBag.email = HttpContext.Session.GetString("Email");
+                    return View();
+                }
+                if (uvm.Balance <= 0)
+                {
+                    ViewBag.Error = "Sorry your balance is 0, you cannot withdraw now. please deposit first";
+                    ViewBag.email = HttpContext.Session.GetString("Email");
+                    return View();
+                }
+                else
+                {
+                    var date = DateTime.Now;
+                    string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type)" +
+                        $"values ('{id}','{wtvm.Name}','{date}','{wtvm.Amount}','{wtvm.Remark}','{"Withdraw"}')";
+                    //If user doesn't exists it inserts data into database
+                    int result = _helper.DMLTransaction(Query);
+                    if (result > 0)
+                    {
+                        string Uquery = $"UPDATE [User] SET Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
+                        int Uresult = _helper.DMLTransaction(Uquery);
+                        if (Uresult > 0)
+                        {
+                            return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                        }
+                    }
                 }
             }
-            ViewBag.Error = "Error while withdraw, please try again!";
+            catch
+            {
+                ViewBag.Error = "Error while withdraw, please try again!";
+                ViewBag.email = HttpContext.Session.GetString("Email");
+            } 
             return View();
         }
 
         [HttpGet]
+        [Route("Home/Deposit")]
         public IActionResult Deposit()
         {
             ViewBag.email = HttpContext.Session.GetString("Email");
@@ -95,7 +125,6 @@ namespace Banker.Controllers
             }
             else
             {
-                ViewBag.Error = "Please Login First";
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -103,24 +132,40 @@ namespace Banker.Controllers
         [HttpPost]
         public IActionResult Deposit(Transection dtvm)
         {
-            var idStr = HttpContext.Session.GetString("OId");
-            int id = CommonHelper.ConvertToInt(idStr); //try-catch
-            var date = DateTime.Now;
-            string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type)" +
-                $"values ('{id}','{dtvm.Name}','{date}','{dtvm.Amount}','{dtvm.Remark}','{"Diposit"}')";
-            //If user doesn't exists it inserts data into database
-            int result = _helper.DMLTransaction(Query);
-            if (result > 0)
+            try
             {
-                string Uquery = $"UPDATE [User] SET Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{dtvm.Amount}') WHERE OId = '{id}'";
-                int Uresult = _helper.DMLTransaction(Uquery);
-                if (Uresult > 0)
+                var idStr = HttpContext.Session.GetString("OId");
+                int id = CommonHelper.ConvertToInt(idStr); //try-catch
+                UserViewModel uvm = new UserViewModel();
+                uvm = _helper.GetUserById(id);
+                if (dtvm.Amount <= 9)
                 {
-                    ViewBag.Success = "Diposit done successfully";
-                    return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                    ViewBag.Error = "You cannot deposit less than 10$!";
+                    ViewBag.email = HttpContext.Session.GetString("Email");
+                    return View();
+                }
+                var date = DateTime.Now;
+                string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type)" +
+                    $"values ('{id}','{dtvm.Name}','{date}','{dtvm.Amount}','{dtvm.Remark}','{"Diposit"}')";
+                //If user doesn't exists it inserts data into database
+                int result = _helper.DMLTransaction(Query);
+                if (result > 0)
+                {
+                    string Uquery = $"UPDATE [User] SET Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{dtvm.Amount}') WHERE OId = '{id}'";
+                    int Uresult = _helper.DMLTransaction(Uquery);
+                    if (Uresult > 0)
+                    {
+                        return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                    }
                 }
             }
-            ViewBag.Error = "Error while depsit, please try again";
+            catch
+            {
+                ViewBag.Error = "Error while depsit, please try again";
+                ViewBag.email = HttpContext.Session.GetString("Email");
+            }
+            
+            
             return View();
         }
     }
