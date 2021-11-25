@@ -35,6 +35,6 @@ namespace Banker.Models.ViewModels
         public string Password { get; set; }
 
 
-        public float Balance { get; set; }
+        public decimal Balance { get; set; }
     }
 }

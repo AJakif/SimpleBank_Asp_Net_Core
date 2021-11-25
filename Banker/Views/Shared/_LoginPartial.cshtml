@@ -2,10 +2,10 @@
 
 
 <ul class="navbar-nav">
-    @if (ViewBag.Email != null)
+    @if (ViewBag.Name != null)
     {
         <li class="nav-item">
-            <a class="nav-link text-white" title="Manage">Hello @ViewBag.Email!</a>
+            <a class="nav-link text-white" title="Manage">Hello @ViewBag.Name!</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white" asp-controller="Account" asp-action="Logout">Logout</a>

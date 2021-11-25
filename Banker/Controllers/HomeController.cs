@@ -23,8 +23,7 @@ namespace Banker.Controllers
 
         public IActionResult Index()
         {
-           
-            ViewBag.email = HttpContext.Session.GetString("Email");
+            _logger.LogInformation("The main page has been accessed");
             return View();
         }
 

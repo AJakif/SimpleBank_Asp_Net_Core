@@ -1,5 +1,7 @@
-﻿using Banker.Helpers;
+﻿using Banker.Extensions;
+using Banker.Helpers;
 using Banker.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -11,61 +13,48 @@ using System.Threading.Tasks;
 
 namespace Banker.Controllers
 {
-
+    
     public class TransectionController : Controller
     {
         private readonly IConfiguration _config;
-        readonly CommonHelper _helper;
+        private readonly ICommonHelper _helper;
 
-        public TransectionController(IConfiguration config)
+        public TransectionController(IConfiguration config, ICommonHelper helper)
         {
             _config = config;
-            _helper = new CommonHelper(_config);
+            _helper = helper;
         }
 
         [HttpGet]
         [Route("Home/Balance")]
+        [Authorize]
         public IActionResult Balance()
         {
-            ViewBag.email = HttpContext.Session.GetString("Email");
-            if (!string.IsNullOrEmpty(ViewBag.Email))
-            {
-                var idStr = HttpContext.Session.GetString("OId");
-                int id = CommonHelper.ConvertToInt(idStr); //try-catch
-                CollectData Model = new CollectData
+            (int id, _) = HttpContext.GetUserInfo();
+            CollectData Model = new CollectData
                 {
                     Transections = _helper.GetTransaction(id),
                     User = _helper.GetUserById(id)
                 };
-                return View(Model);
-            }
-            else
-            {
-                return RedirectToAction("Login","Account");
-            }
-            
+            (_, string name) = HttpContext.GetUserInfo();
+            ViewBag.Name = name;
+            return View(Model);
         }
 
         [HttpGet]
         [Route("Home/Withdraw")]
+        [Authorize]
         public IActionResult Withdraw()
         {
-            ViewBag.email = HttpContext.Session.GetString("Email");
-            if (!string.IsNullOrEmpty(ViewBag.Email))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            (_, string name) = HttpContext.GetUserInfo();
+            ViewBag.Name = name;
+            return View();
         }
 
         [HttpPost]
         public IActionResult Withdraw( Transection wtvm)
         {
-            var idStr = HttpContext.Session.GetString("OId");
-            int id = CommonHelper.ConvertToInt(idStr); //try-catch
+            (int id, _) = HttpContext.GetUserInfo(); //try-catch
             try
             {
                 UserViewModel uvm = new UserViewModel();
@@ -78,14 +67,16 @@ namespace Banker.Controllers
                 }
                 if(wtvm.Amount > uvm.Balance)
                 {
-                    ViewBag.Error = "You cannot withdraw more than your balance!";
-                    ViewBag.email = HttpContext.Session.GetString("Email");
-                    return View();
-                }
-                if (uvm.Balance <= 0)
-                {
-                    ViewBag.Error = "Sorry your balance is 0, you cannot withdraw now. please deposit first";
-                    ViewBag.email = HttpContext.Session.GetString("Email");
+                    if (uvm.Balance <= 0)
+                    {
+                        ViewBag.Error = "Sorry your balance is 0, you cannot withdraw now. please deposit first";
+                        ViewBag.email = HttpContext.Session.GetString("Email");
+                    }
+                    else
+                    {
+                        ViewBag.Error = "You cannot withdraw more than your balance!";
+                        ViewBag.email = HttpContext.Session.GetString("Email");
+                    }
                     return View();
                 }
                 else
@@ -101,12 +92,12 @@ namespace Banker.Controllers
                         int Uresult = _helper.DMLTransaction(Uquery);
                         if (Uresult > 0)
                         {
-                            return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                            return RedirectToRoute("balance"); //Redirects to Home accounts index view
                         }
                     }
                 }
             }
-            catch
+            catch(NullReferenceException)
             {
                 ViewBag.Error = "Error while withdraw, please try again!";
                 ViewBag.email = HttpContext.Session.GetString("Email");
@@ -116,17 +107,12 @@ namespace Banker.Controllers
 
         [HttpGet]
         [Route("Home/Deposit")]
+        [Authorize]
         public IActionResult Deposit()
         {
-            ViewBag.email = HttpContext.Session.GetString("Email");
-            if (!string.IsNullOrEmpty(ViewBag.Email))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            (_, string name) = HttpContext.GetUserInfo();
+            ViewBag.Name = name;
+            return View();
         }
 
         [HttpPost]
@@ -134,8 +120,7 @@ namespace Banker.Controllers
         {
             try
             {
-                var idStr = HttpContext.Session.GetString("OId");
-                int id = CommonHelper.ConvertToInt(idStr); //try-catch
+                (int id, _) = HttpContext.GetUserInfo();
                 UserViewModel uvm = new UserViewModel();
                 uvm = _helper.GetUserById(id);
                 if (dtvm.Amount <= 9)
@@ -155,11 +140,11 @@ namespace Banker.Controllers
                     int Uresult = _helper.DMLTransaction(Uquery);
                     if (Uresult > 0)
                     {
-                        return RedirectToAction("Balance", "Transection"); //Redirects to Home accounts index view
+                        return RedirectToRoute("balance"); //Redirects to Home accounts index view
                     }
                 }
             }
-            catch
+            catch(NullReferenceException)
             {
                 ViewBag.Error = "Error while depsit, please try again";
                 ViewBag.email = HttpContext.Session.GetString("Email");

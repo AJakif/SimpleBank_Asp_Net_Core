@@ -1,4 +1,6 @@
 using Banker.Data;
+using Banker.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,6 +36,7 @@ namespace Banker
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddTransient<ICommonHelper, CommonHelper>(); //
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMvc().AddSessionStateTempDataProvider(); // service for session
@@ -41,11 +46,21 @@ namespace Banker
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Login";
+                    options.Cookie.Name = "Bank";
+                
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            var path = Directory.GetCurrentDirectory();
+            loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -65,40 +80,49 @@ namespace Banker
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+
+            app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "/",
+                    defaults: new { controller = "Home", action = "Index", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "register",
                     pattern: "Registration",
                     defaults: new { controller = "Account", action = "Register", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "login",
                     pattern: "Login",
                     defaults: new { controller = "Account", action = "Login", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "logout",
+                    pattern: "Logout",
+                    defaults: new { controller = "Account", action = "Logout", });
+
+                endpoints.MapControllerRoute(
+                    name: "dashboard",
                     pattern: "Home/Dashboard",
                     defaults: new { controller = "Account", action = "Welcome", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "balance",
                     pattern: "Home/Balance",
                     defaults: new { controller = "Transection", action = "Balance", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "withdraw",
                     pattern: "Home/Withdraw",
                     defaults: new { controller = "Transection", action = "Withdraw", });
 
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "deposit",
                     pattern: "Home/Deposit",
                     defaults: new { controller = "Transection", action = "Deposit", });
 

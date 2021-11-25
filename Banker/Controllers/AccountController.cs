@@ -1,38 +1,47 @@
-﻿using Banker.Helpers;
+﻿using Banker.Extensions;
+using Banker.Helpers;
 using Banker.Models.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Banker.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _config;
-        readonly CommonHelper _helper; //Object of common helper
+        private readonly ICommonHelper _helper;
 
-        public AccountController(IConfiguration config) //Constructor
+        public AccountController(ILogger<AccountController> logger, IConfiguration config, ICommonHelper helper)
         {
+            _logger = logger;
             _config = config;
-            _helper = new CommonHelper(_config);
+            _helper = helper;
         }
 
         [HttpGet]
         [Route("/Registration")]
         public IActionResult Register()
         {
+            _logger.LogInformation("The Register page has been accessed");
             return View();
         }
         [HttpPost]
         public IActionResult Register(RegisterViewModel rvm)
         {
+            _logger.LogInformation("The Register Post methhod has been called");
             try
             {
                 string UserExistsQuery = $"Select * from [User] where Name='{rvm.Name}'" + $"OR Email = '{rvm.Email}'"; //Query for user existence
@@ -51,14 +60,14 @@ namespace Banker.Controllers
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
                 {
-                    /*EntryIntoSession(rvm.Email);*///Inserts Query into database and stores user name in session
                     ViewBag.Success = "Registration Successful!";
-                    return RedirectToAction("Index", "Home"); //Redirects to Home accounts index view
+                    return RedirectToRoute("default"); //Redirects to Home accounts index view
 
                 }
             }
-            catch
+            catch (NullReferenceException e)
             {
+                _logger.LogError($"Exception - '{e}'");
                 ViewBag.Error = "Registration Failed, Please Try again!";
                 ViewBag.email = HttpContext.Session.GetString("Email");
             }
@@ -69,11 +78,12 @@ namespace Banker.Controllers
         [Route("/Login")]
         public IActionResult Login()
         {
+            _logger.LogInformation("The Login page has been accessed");
             return View();
         }
 
         [HttpPost]
-        public IActionResult Login(LoginViewModel lvm)
+        public async Task<IActionResult>  Login(LoginViewModel lvm)
         {
             try
             {
@@ -84,93 +94,80 @@ namespace Banker.Controllers
                 }
                 else
                 {
-                    bool Isfind = SignInMethod(lvm.Email, lvm.Password);
-                    if (Isfind == true)
+                    string query = $"select * from [User] where Email='{lvm.Email}' and Password='{lvm.Password}'";
+                    _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
+                    UserViewModel userDetails = _helper.GetUserByEmail(query);
+
+                    if (userDetails.Email != null) //all data should be null checked
                     {
-                        var idStr = HttpContext.Session.GetString("OId");
-                        int id = CommonHelper.ConvertToInt(idStr); //try-catch
+                        var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Email,userDetails.Email),
+                    new Claim("FullName", userDetails.Name),
+                    new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString())
+                };
+                        var identity = new ClaimsIdentity(
+                            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            AllowRefresh = true,
+                            // Refreshing the authentication session should be allowed.
+
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10)
+                            // The time at which the authentication ticket expires. A 
+                            // value set here overrides the ExpireTimeSpan option of 
+                            // CookieAuthenticationOptions set with AddCookie.
+                        };
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
+
+
                         var date = DateTime.Now;
-                        string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{id}','{date}')";
+                        string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{userDetails.OId}','{date}')";
                         int result = _helper.DMLTransaction(Query);
                         if (result > 0)
                         {
-                            return RedirectToAction("Welcome");
+                            _logger.LogInformation("User Logged in");
+                            return RedirectToRoute("dashboard");
                         }
 
                     }
                 }
             }
-            catch
+            catch(NullReferenceException e)
             {
+
+                _logger.LogError("Exception",e);
                 ViewBag.Error = "There is an error while login, please contact admin";
                 ViewBag.email = HttpContext.Session.GetString("Email");
             }  
                 return View();
         }
-
+        
         [Route("Home/Dashboard")]
+        [Authorize]
         public IActionResult Welcome()
         {
-            ViewBag.email = HttpContext.Session.GetString("Email");
-            if (!string.IsNullOrEmpty(ViewBag.Email))
-            {
-                var idStr = HttpContext.Session.GetString("OId");
-                int id = CommonHelper.ConvertToInt(idStr); //try-catch
-                HistoryViewModel hvm = _helper.GetHistory(id);
-                ViewBag.Name = HttpContext.Session.GetString("Name");
-                return View(hvm);
-            }
-            else
-            {
-                return RedirectToAction("Login");
-            }
-                
+            (int id,_) = HttpContext.GetUserInfo();
+
+            _logger.LogInformation("The Login Dashboard page has been accessed");
+
+            HistoryViewModel hvm = _helper.GetHistory(id);
+            (_,string name) = HttpContext.GetUserInfo();
+            ViewBag.Name = name;
+            return View(hvm);
+
+
         }
 
-        public IActionResult Logout()
+       
+        [Route("Logout")]
+        public async Task<IActionResult>  Logout()
         {
-            HttpContext.Session.Clear();
-            ViewBag.Success = "Logout successfull";
-            return RedirectToAction("Index","Home");
+            _logger.LogInformation("User logout called");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            _logger.LogInformation("User logged out");
+            return RedirectToRoute("default");
         }
-
-        private bool SignInMethod(string Email, string Password)
-        {
-            bool flag = false;
-            string query = $"select * from [User] where Email='{Email}' and Password='{Password}'";
-            UserViewModel userDetails = _helper.GetUserByEmail(query);
-
-            if (userDetails.Email != null) //all data should be null checked
-            {
-                HttpContext.Session.SetString("OId", userDetails.OId.ToString());
-                HttpContext.Session.SetString("Name", userDetails.Name);
-                HttpContext.Session.SetString("Address", userDetails.Address);
-                HttpContext.Session.SetString("Gender", userDetails.Gender);
-                HttpContext.Session.SetString("Phone", userDetails.Phone);
-                HttpContext.Session.SetString("Email", userDetails.Email);
-
-                flag = true;
-                
-            }
-            else
-            {
-                ViewBag.Error = "Email & Password are wrong";
-            }
-            return flag;
-        }
-
-
-        private void EntryIntoSession(string Email)
-        {
-            HttpContext.Session.SetString("Email", Email);
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        
-
     }
 }

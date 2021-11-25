@@ -1,6 +1,8 @@
 ﻿using Banker.Models.ViewModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,16 @@ using System.Threading.Tasks;
 
 namespace Banker.Helpers
 {
-    public class CommonHelper
+    public interface ICommonHelper
+    {
+        UserViewModel GetUserByEmail(string query);
+        UserViewModel GetUserById(int id);
+        int DMLTransaction(string Query);
+        bool UserAlreadyExists(string query);
+        List<Transection> GetTransaction(int id);
+        HistoryViewModel GetHistory(int id);
+    }
+    public class CommonHelper : ICommonHelper
     {
         private readonly IConfiguration _config;
 
@@ -16,8 +27,6 @@ namespace Banker.Helpers
         {
             _config = config;
         }
-
-
         public UserViewModel GetUserByEmail (string query)
         {
             UserViewModel user = new UserViewModel();
@@ -40,7 +49,7 @@ namespace Banker.Helpers
                         user.Phone = dataReader["Phone"].ToString();
                         user.Email = dataReader["Email"].ToString();
                         user.Password = dataReader["Password"].ToString();
-                        user.Balance = Convert.ToDouble(dataReader["Balance"]);
+                        user.Balance = Convert.ToDecimal(dataReader["Balance"]);
 
                     }
                 }
@@ -62,10 +71,17 @@ namespace Banker.Helpers
                 SqlCommand command = new SqlCommand(sql, connection);
                 using (SqlDataReader dataReader = command.ExecuteReader())
                 {
-                    while (dataReader.Read()) //make it single user
+                    try
                     {
-                        user.Balance = Convert.ToDouble(dataReader["Balance"]);
+                        while (dataReader.Read()) //make it single user
+                        {
+                            user.Balance = Convert.ToDecimal(dataReader["Balance"]);
 
+                        }
+                    }
+                    catch(NullReferenceException )
+                    {
+                        
                     }
                 }
                 connection.Close();
@@ -99,35 +115,23 @@ namespace Banker.Helpers
                 string sql = query;
                 SqlCommand command = new SqlCommand(sql, connection);
                 SqlDataReader dr = command.ExecuteReader();
-                if(dr.HasRows)
+                try
                 {
-                    flag = true;
+                    if (dr.HasRows)
+                    {
+                        flag = true;
+                    }
                 }
+                catch(NullReferenceException e)
+                {
+                   
+                }
+                
                 connection.Close();
 
             }
             return flag;
 
-        }
-
-        public static int ConvertToInt(string str)
-        {
-            int result = 0;
-
-            if (string.IsNullOrEmpty(str)) {
-                return result;
-            }
-            
-            try
-            {
-                result = int.Parse(str);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return result;
         }
 
         public List<Transection> GetTransaction(int id)
@@ -142,22 +146,30 @@ namespace Banker.Helpers
                 SqlCommand command = new SqlCommand(sql, connection);
                 using (SqlDataReader dataReader = command.ExecuteReader())
                 {
-                    while (dataReader.Read()) //make it single user
+                    try
                     {
-                        Transection trans = new Transection
+                        while (dataReader.Read()) //make it single user
                         {
-                            OId = Convert.ToInt32(dataReader["OId"]),
-                            UserId = Convert.ToInt32(dataReader["UserId"]),
-                            Name = dataReader["Name"].ToString(),
-                            Date = Convert.ToDateTime(dataReader["Date"]),
-                            Amount = Convert.ToDouble(dataReader["Amount"]),
-                            Remark = dataReader["Remark"].ToString(),
-                            Type = dataReader["Type"].ToString()
-                        };
+                            Transection trans = new Transection
+                            {
+                                OId = Convert.ToInt32(dataReader["OId"]),
+                                UserId = Convert.ToInt32(dataReader["UserId"]),
+                                Name = dataReader["Name"].ToString(),
+                                Date = Convert.ToDateTime(dataReader["Date"]),
+                                Amount = Convert.ToDecimal(dataReader["Amount"]),
+                                Remark = dataReader["Remark"].ToString(),
+                                Type = dataReader["Type"].ToString()
+                            };
 
-                        TransactionList.Add(trans);
+                            TransactionList.Add(trans);
 
+                        }
                     }
+                    catch(NullReferenceException e)
+                    {
+                        
+                    }
+                    
                 }
                 connection.Close();
             }
@@ -179,15 +191,24 @@ namespace Banker.Helpers
                 {
                     while (dataReader.Read()) //make it single user
                     {
-                        HistoryViewModel history = new HistoryViewModel
+                        try
                         {
-                            OId = Convert.ToInt32(dataReader["OId"]),
-                            UserId = Convert.ToInt32(dataReader["UserId"]),
-                            DateTime = Convert.ToDateTime(dataReader["DateTime"])
-                        };
+                            if(dataReader != null)
+                            {
+                                HistoryViewModel history = new HistoryViewModel
+                                {
+                                    OId = Convert.ToInt32(dataReader["OId"]),
+                                    UserId = Convert.ToInt32(dataReader["UserId"]),
+                                    DateTime = Convert.ToDateTime(dataReader["DateTime"])
+                                };
 
-                        historyList.Add(history);
-
+                                historyList.Add(history);
+                            }
+                        }
+                        catch (NullReferenceException e)
+                        {
+                            Console.Write(e);
+                        }
                     }
                 }
                 connection.Close();
