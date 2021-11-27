@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-@*@model Banker.Models.ViewModels.UserViewModel*@
 
 <div class="text-center">
     @if (ViewBag.Success != null)
@@ -9,11 +8,15 @@
         <span class="alert alert-Success">@ViewBag.Success</span>
 
     }
-    <h1 class="display-4">Welcome</h1>
-    @if (ViewBag.Email != null)
+    @if (ViewBag.Success != null)
     {
-        <h3 class="display-4">@ViewBag.Email</h3>
+        <span class="alert alert-danger">@ViewBag.Error</span>
     }
-    
-   
+    <h1 class="display-4">Welcome To <b>Bank</b>u</h1>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h3 class="display-4"> @User.FindFirst("Name").Value</h3>
+    }
+
+
 </div>

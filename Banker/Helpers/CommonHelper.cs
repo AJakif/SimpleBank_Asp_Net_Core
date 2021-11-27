@@ -10,23 +10,17 @@ using System.Threading.Tasks;
 
 namespace Banker.Helpers
 {
-    public interface ICommonHelper
-    {
-        UserViewModel GetUserByEmail(string query);
-        UserViewModel GetUserById(int id);
-        int DMLTransaction(string Query);
-        bool UserAlreadyExists(string query);
-        List<Transection> GetTransaction(int id);
-        HistoryViewModel GetHistory(int id);
-    }
     public class CommonHelper : ICommonHelper
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<CommonHelper> _logger;
 
-        public CommonHelper(IConfiguration config)
+        public CommonHelper(IConfiguration config, ILogger<CommonHelper> logger)
         {
             _config = config;
+            _logger = logger;
         }
+
         public UserViewModel GetUserByEmail (string query)
         {
             UserViewModel user = new UserViewModel();
@@ -40,17 +34,24 @@ namespace Banker.Helpers
                 SqlCommand command = new SqlCommand(sql, connection);
                 using(SqlDataReader dataReader = command.ExecuteReader())
                 {
-                    while (dataReader.Read()) //make it single user
+                    try
                     {
-                        user.OId = Convert.ToInt32(dataReader["OId"]);
-                        user.Name = dataReader["Name"].ToString();
-                        user.Address = dataReader["Address"].ToString();
-                        user.Gender = dataReader["Gender"].ToString();
-                        user.Phone = dataReader["Phone"].ToString();
-                        user.Email = dataReader["Email"].ToString();
-                        user.Password = dataReader["Password"].ToString();
-                        user.Balance = Convert.ToDecimal(dataReader["Balance"]);
+                        while (dataReader.Read()) //make it single user
+                        {
+                            user.OId = Convert.ToInt32(dataReader["OId"]);
+                            user.Name = dataReader["Name"].ToString();
+                            user.Address = dataReader["Address"].ToString();
+                            user.Gender = dataReader["Gender"].ToString();
+                            user.Phone = dataReader["Phone"].ToString();
+                            user.Email = dataReader["Email"].ToString();
+                            user.Password = dataReader["Password"].ToString();
+                            user.Balance = Convert.ToDecimal(dataReader["Balance"]);
 
+                        }
+                    }
+                    catch(NullReferenceException e)
+                    {
+                        _logger.LogWarning($"'{e}' Exception");
                     }
                 }
                 connection.Close();
@@ -79,9 +80,9 @@ namespace Banker.Helpers
 
                         }
                     }
-                    catch(NullReferenceException )
+                    catch(NullReferenceException e )
                     {
-                        
+                        _logger.LogWarning($"'{e}' Exception");
                     }
                 }
                 connection.Close();
@@ -100,6 +101,7 @@ namespace Banker.Helpers
                 string sql = Query;
                 SqlCommand command = new SqlCommand(sql, connection);
                 Result = command.ExecuteNonQuery();
+                _logger.LogInformation("Data Inserted");
                 connection.Close();
             }
             return Result;
@@ -122,11 +124,11 @@ namespace Banker.Helpers
                         flag = true;
                     }
                 }
-                catch(NullReferenceException e)
+                catch (NullReferenceException e)
                 {
-                   
+                    _logger.LogWarning($"'{e}' Exception");
                 }
-                
+
                 connection.Close();
 
             }
@@ -165,11 +167,11 @@ namespace Banker.Helpers
 
                         }
                     }
-                    catch(NullReferenceException e)
+                    catch (NullReferenceException e)
                     {
-                        
+                        _logger.LogWarning($"'{e}' Exception");
                     }
-                    
+
                 }
                 connection.Close();
             }
@@ -207,7 +209,7 @@ namespace Banker.Helpers
                         }
                         catch (NullReferenceException e)
                         {
-                            Console.Write(e);
+                            _logger.LogWarning($"'{e}' Exception");
                         }
                     }
                 }

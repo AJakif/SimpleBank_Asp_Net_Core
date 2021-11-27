@@ -13,7 +13,7 @@ namespace Banker.Extensions
         {
             try
             {
-                return  (Convert.ToInt32(httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value), httpContext.User.FindFirst("FullName").Value)  ;
+                return  (Convert.ToInt32(httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value), httpContext.User.FindFirst("Name").Value)  ;
             }
             catch (NullReferenceException)
             {

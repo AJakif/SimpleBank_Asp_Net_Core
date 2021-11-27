@@ -38,6 +38,7 @@ namespace Banker.Controllers
             _logger.LogInformation("The Register page has been accessed");
             return View();
         }
+
         [HttpPost]
         public IActionResult Register(RegisterViewModel rvm)
         {
@@ -90,6 +91,7 @@ namespace Banker.Controllers
                 if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
                 {
                     ViewBag.Error = "Email & Password are empty";
+                    _logger.LogInformation("Email & Password input is empty");
                     return View();
                 }
                 else
@@ -97,15 +99,18 @@ namespace Banker.Controllers
                     string query = $"select * from [User] where Email='{lvm.Email}' and Password='{lvm.Password}'";
                     _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
                     UserViewModel userDetails = _helper.GetUserByEmail(query);
+                    _logger.LogInformation($"Userdetails '{userDetails}'");
 
                     if (userDetails.Email != null) //all data should be null checked
                     {
                         var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email,userDetails.Email),
-                    new Claim("FullName", userDetails.Name),
+                    new Claim("Name", userDetails.Name),
                     new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString())
+
                 };
+                        _logger.LogInformation("User Email, Name and Id set on claim");
                         var identity = new ClaimsIdentity(
                             claims, CookieAuthenticationDefaults.AuthenticationScheme);
                         var authProperties = new AuthenticationProperties
@@ -120,26 +125,23 @@ namespace Banker.Controllers
                         };
 
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
-
-
                         var date = DateTime.Now;
                         string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{userDetails.OId}','{date}')";
                         int result = _helper.DMLTransaction(Query);
+                        
                         if (result > 0)
                         {
+                            _logger.LogInformation("Login History Inserted");
                             _logger.LogInformation("User Logged in");
                             return RedirectToRoute("dashboard");
                         }
-
                     }
                 }
             }
             catch(NullReferenceException e)
             {
-
                 _logger.LogError("Exception",e);
                 ViewBag.Error = "There is an error while login, please contact admin";
-                ViewBag.email = HttpContext.Session.GetString("Email");
             }  
                 return View();
         }
@@ -153,11 +155,7 @@ namespace Banker.Controllers
             _logger.LogInformation("The Login Dashboard page has been accessed");
 
             HistoryViewModel hvm = _helper.GetHistory(id);
-            (_,string name) = HttpContext.GetUserInfo();
-            ViewBag.Name = name;
             return View(hvm);
-
-
         }
 
        

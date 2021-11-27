@@ -2,10 +2,10 @@
 
 
 <ul class="navbar-nav">
-    @if (ViewBag.Name != null)
+    @if (User.Identity.IsAuthenticated)
     {
         <li class="nav-item">
-            <a class="nav-link text-white" title="Manage">Hello @ViewBag.Name!</a>
+            <a class="nav-link text-white" title="Manage">Hello @User.FindFirst("Name").Value!</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white" asp-controller="Account" asp-action="Logout">Logout</a>
