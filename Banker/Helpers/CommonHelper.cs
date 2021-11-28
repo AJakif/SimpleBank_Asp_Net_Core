@@ -97,17 +97,24 @@ namespace Banker.Helpers
             _logger.LogInformation("Entered in DMLTransaction..");
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+            try
             {
-                connection.Open();
-
                 string sql = Query;
                 SqlCommand command = new SqlCommand(sql, connection);
                 Result = command.ExecuteNonQuery();
                 _logger.LogInformation("Data Inserted");
                 connection.Close();
+                return Result;
             }
-            return Result;
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception..");
+                connection.Close();
+                return -1;
+            }
+
         }
         
         public bool UserAlreadyExists(string query)

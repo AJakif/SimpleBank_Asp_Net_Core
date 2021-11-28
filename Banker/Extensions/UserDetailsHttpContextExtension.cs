@@ -16,7 +16,7 @@ namespace Banker.Extensions
             {
                 return  (Convert.ToInt32(httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value), httpContext.User.FindFirst("Name").Value)  ;
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
                 return (-1, null);
             }

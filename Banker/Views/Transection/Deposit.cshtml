@@ -6,8 +6,6 @@
 }
 
 <h1>Deposit</h1>
-
-<h4>Transection</h4>
 <hr />
 <div>
     @if (ViewBag.Error != null)
@@ -24,12 +22,12 @@
 
             <div class="form-group">
                 <label asp-for="Name" class="control-label">Dipositor Name</label><span style="color:red">*</span>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" type="text" class="form-control"  onkeyup="lettersOnly(this)" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Amount" class="control-label"></label><span style="color:red">*</span>
-                <input asp-for="Amount" class="form-control" />
+                <input asp-for="Amount" type="number" class="form-control" onkeyup="NumbersOnly(this)" />
                 <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -56,5 +54,6 @@
 
 
 @section Scripts {
+    <script src="~/js/transaction.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

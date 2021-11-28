@@ -54,9 +54,8 @@ namespace Banker.Controllers
                     return View();
                 }
                 //if user exists then returns to Account controller and redirects to register view
-                var date = DateTime.Now;
                 string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance,Created_at,Created_by)" +
-                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}','{date}','{rvm.Name}')";
+                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}',GETDATE(),'{rvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
@@ -124,8 +123,8 @@ namespace Banker.Controllers
                         };
 
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
-                        var date = DateTime.Now;
-                        string Query = "Insert into [LoginHistory] (UserId,DateTime,Created_at,Created_by)" + $"values ('{userDetails.OId}','{date}','{date}',(SELECT Name FROM[User] WHERE OId = '{userDetails.OId}'))";
+                        
+                        string Query = "Insert into [LoginHistory] (UserId,DateTime,Created_at,Created_by)" + $"values ('{userDetails.OId}',GETDATE(),GETDATE(),(SELECT Name FROM[User] WHERE OId = '{userDetails.OId}'))";
                         int result = _helper.DMLTransaction(Query);
                         
                         if (result > 0)
@@ -134,6 +133,16 @@ namespace Banker.Controllers
                             _logger.LogInformation("User Logged in");
                             return RedirectToRoute("dashboard");
                         }
+                        else
+                        {
+                            ViewBag.Error = "Wrong Email & Password, please try again";
+                            return View();
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.Error = "Wrong Email & Password, please try again";
+                        return View();
                     }
                 }
             }

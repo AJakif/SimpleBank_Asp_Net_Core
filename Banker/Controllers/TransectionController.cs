@@ -82,14 +82,13 @@ namespace Banker.Controllers
                 }
                 else
                 {
-                    var date = DateTime.Now;
                     string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                        $"values ('{id}','{wtvm.Name}','{date}','{wtvm.Amount}','{wtvm.Remark}','{"Withdraw"}','{date}','{wtvm.Name}')";
+                        $"values ('{id}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Remark}','{"Withdraw"}',GETDATE(),'{wtvm.Name}')";
                     //If user doesn't exists it inserts data into database
                     int result = _helper.DMLTransaction(Query);
                     if (result > 0)
                     {
-                        string Uquery = $"UPDATE [User] SET Updated_at = '{DateTime.Now}',Updated_by= '{wtvm.Name}' , Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
+                        string Uquery = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{wtvm.Name}' , Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
                         int Uresult = _helper.DMLTransaction(Uquery);
                         if (Uresult > 0)
                         {
@@ -133,12 +132,12 @@ namespace Banker.Controllers
                 }
                 var date = DateTime.Now;
                 string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                    $"values ('{id}','{dtvm.Name}','{date}','{dtvm.Amount}','{dtvm.Remark}','{"Diposit"}','{DateTime.Now}','{dtvm.Name}')";
+                    $"values ('{id}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Remark}','{"Diposit"}',GETDATE(),'{dtvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
                 {
-                    string Uquery = $"UPDATE [User] SET Updated_at = '{DateTime.Now}',Updated_by= '{dtvm.Name}' ,Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{dtvm.Amount}') WHERE OId = '{id}'";
+                    string Uquery = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{dtvm.Name}' ,Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{dtvm.Amount}') WHERE OId = '{id}'";
                     int Uresult = _helper.DMLTransaction(Uquery);
                     if (Uresult > 0)
                     {
