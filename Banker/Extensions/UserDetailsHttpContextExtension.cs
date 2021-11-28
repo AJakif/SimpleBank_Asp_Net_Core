@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Banker.Extensions
             {
                 return  (Convert.ToInt32(httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value), httpContext.User.FindFirst("Name").Value)  ;
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException e)
             {
                 return (-1, null);
             }

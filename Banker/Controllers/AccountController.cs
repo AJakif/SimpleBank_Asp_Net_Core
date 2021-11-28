@@ -54,14 +54,14 @@ namespace Banker.Controllers
                     return View();
                 }
                 //if user exists then returns to Account controller and redirects to register view
-
-                string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance)" +
-                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}')";
+                var date = DateTime.Now;
+                string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance,Created_at,Created_by)" +
+                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}','{date}','{rvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
                 {
-                    ViewBag.Success = "Registration Successful!";
+                    _logger.LogInformation("User data Inserted");
                     return RedirectToRoute("default"); //Redirects to Home accounts index view
 
                 }
@@ -70,7 +70,6 @@ namespace Banker.Controllers
             {
                 _logger.LogError($"Exception - '{e}'");
                 ViewBag.Error = "Registration Failed, Please Try again!";
-                ViewBag.email = HttpContext.Session.GetString("Email");
             }
             return View();
         }
@@ -91,7 +90,7 @@ namespace Banker.Controllers
                 if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
                 {
                     ViewBag.Error = "Email & Password are empty";
-                    _logger.LogInformation("Email & Password input is empty");
+                    _logger.LogInformation("Email & Password input are empty");
                     return View();
                 }
                 else
@@ -101,7 +100,7 @@ namespace Banker.Controllers
                     UserViewModel userDetails = _helper.GetUserByEmail(query);
                     _logger.LogInformation($"Userdetails '{userDetails}'");
 
-                    if (userDetails.Email != null) //all data should be null checked
+                    if (userDetails != null && userDetails.Email != null) //all data should be null checked
                     {
                         var claims = new List<Claim>
                 {
@@ -126,7 +125,7 @@ namespace Banker.Controllers
 
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
                         var date = DateTime.Now;
-                        string Query = "Insert into [LoginHistory] (UserId,DateTime)" + $"values ('{userDetails.OId}','{date}')";
+                        string Query = "Insert into [LoginHistory] (UserId,DateTime,Created_at,Created_by)" + $"values ('{userDetails.OId}','{date}','{date}',(SELECT Name FROM[User] WHERE OId = '{userDetails.OId}'))";
                         int result = _helper.DMLTransaction(Query);
                         
                         if (result > 0)

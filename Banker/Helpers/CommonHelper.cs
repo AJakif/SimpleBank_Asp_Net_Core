@@ -23,6 +23,7 @@ namespace Banker.Helpers
 
         public UserViewModel GetUserByEmail (string query)
         {
+            _logger.LogInformation("Entered in GetUserByEmail..");
             UserViewModel user = new UserViewModel();
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -61,6 +62,7 @@ namespace Banker.Helpers
 
         public UserViewModel GetUserById(int id)
         {
+            _logger.LogInformation("Entered in GetUserById..");
             UserViewModel user = new UserViewModel();
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -92,6 +94,7 @@ namespace Banker.Helpers
 
         public int DMLTransaction(string Query)
         {
+            _logger.LogInformation("Entered in DMLTransaction..");
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -109,6 +112,7 @@ namespace Banker.Helpers
         
         public bool UserAlreadyExists(string query)
         {
+            _logger.LogInformation("Entered in UserAlreadyExists..");
             bool flag = false;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -122,6 +126,7 @@ namespace Banker.Helpers
                     if (dr.HasRows)
                     {
                         flag = true;
+                        _logger.LogInformation("User Already Exist..");
                     }
                 }
                 catch (NullReferenceException e)
@@ -209,7 +214,7 @@ namespace Banker.Helpers
                         }
                         catch (NullReferenceException e)
                         {
-                            _logger.LogWarning($"'{e}' Exception");
+                            _logger.LogError($"'{e}' Exception");
                         }
                     }
                 }
