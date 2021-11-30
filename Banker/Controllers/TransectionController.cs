@@ -132,7 +132,7 @@ namespace Banker.Controllers
                 }
                 var date = DateTime.Now;
                 string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                    $"values ('{id}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Remark}','{"Diposit"}',GETDATE(),'{dtvm.Name}')";
+                    $"values ('{id}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Remark}','{"Deposit"}',GETDATE(),'{dtvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)

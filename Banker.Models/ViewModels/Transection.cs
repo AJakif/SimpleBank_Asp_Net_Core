@@ -22,10 +22,11 @@ namespace Banker.Models.ViewModels
         public DateTime Date { get; set; }
 
         [Required]
+
+        [DataType(DataType.Currency)]
         public decimal Amount { get; set; }
 
         [Required]
-        [DataType(DataType.Currency)]
         public string Remark { get; set; }
 
         [Required]

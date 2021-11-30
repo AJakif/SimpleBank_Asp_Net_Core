@@ -126,6 +126,11 @@ namespace Banker
                     pattern: "Home/Deposit",
                     defaults: new { controller = "Transection", action = "Deposit", });
 
+                endpoints.MapControllerRoute(
+                    name: "report",
+                    pattern: "Home/Report",
+                    defaults: new { controller = "Report", action = "Report", });
+
 
 
                 endpoints.MapRazorPages();
