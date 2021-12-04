@@ -151,16 +151,16 @@
             var A = []
             
             for (var i = 0; i < yearList.length; i++) {
-                var total2 = [];
+                var total = [];
                 let year;
                 year = yearList[i].year;
                 for (var j = 0; j < yearList[i].list.length; j ++) {
                     
-                    total2.push(yearList[i].list[j].total)
+                    total.push(yearList[i].list[j].total)
                 }
                 A.push({
                     name:year,
-                    data: total2
+                    data: total
                 })
                 
             }
@@ -233,16 +233,16 @@
             var A = []
 
             for (var i = 0; i < yearList.length; i++) {
-                var total2 = [];
+                var total = [];
                 let year;
                 year = yearList[i].year;
                 for (var j = 0; j < yearList[i].list.length; j++) {
 
-                    total2.push(yearList[i].list[j].total)
+                    total.push(yearList[i].list[j].total)
                 }
                 A.push({
                     name: year,
-                    data: total2
+                    data: total
                 })
 
             }
@@ -305,7 +305,333 @@
         /* ajax end*/
     })
 
-    
+
+    /* deposit bar*/
+    $.ajax({
+        /* ajax start*/
+        url: '/Home/Report/yearlyCatDeposit',
+        type: 'GET',
+        dataType: 'JSON',
+        success: function (remarkList) {
+            var A = []
+
+            for (var i = 0; i < remarkList.length; i++) {
+                var total = [];
+                let remark  = remarkList[i].remark;
+                for (var j = 0; j < remarkList[i].list.length; j++) {
+
+                    total.push(remarkList[i].list[j].total)
+                }
+                A.push({
+                    name: remark,
+                    data: total
+                })
+
+            }
+            /*Highcharts using here.. Line CHART*/
+            Highcharts.chart('linechart1', {
+
+                title: {
+                    text: 'Yearly deposit, 2017-2021'
+                },
+
+                yAxis: {
+                    title: {
+                        text: 'Total deposit amount'
+                    }
+                },
+
+                xAxis: {
+                    accessibility: {
+                        rangeDescription: 'Range: 2017 to 2021'
+                    }
+                },
+
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+
+                plotOptions: {
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        },
+                        pointStart: 2017
+                    }
+                },
+
+                series: A,
+
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                }
+
+            });
+
+        },
+        Error: function (json) {
+
+        }
+        /* ajax end*/
+    })
+
+    /* Withdraw bar*/
+    $.ajax({
+        /* ajax start*/
+        url: '/Home/Report/yearlyCatWithdraw',
+        type: 'GET',
+        dataType: 'JSON',
+        success: function (remarkList) {
+            var A = []
+
+            for (var i = 0; i < remarkList.length; i++) {
+                var total = [];
+                let remark = remarkList[i].remark;
+                for (var j = 0; j < remarkList[i].list.length; j++) {
+
+                    total.push(remarkList[i].list[j].total)
+                }
+                A.push({
+                    name: remark,
+                    data: total
+                })
+
+            }
+            /*Highcharts using here.. Line CHART*/
+            Highcharts.chart('linechart2', {
+
+                title: {
+                    text: 'Yearly withdraw, 2017-2021'
+                },
+
+                yAxis: {
+                    title: {
+                        text: 'Total withdraw amount'
+                    }
+                },
+
+                xAxis: {
+                    accessibility: {
+                        rangeDescription: 'Range: 2017 to 2021'
+                    }
+                },
+
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+
+                plotOptions: {
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        },
+                        pointStart: 2017
+                    }
+                },
+
+                series: A,
+
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                }
+
+            });
+
+        },
+        Error: function (json) {
+
+        }
+        /* ajax end*/
+    })
+
+
+    /* Yearly deposit drildown pie*/
+    $.ajax({
+        /* ajax start*/
+        url: '/Home/Report/monthlyYearlyDeposit',
+        type: 'GET',
+        dataType: 'JSON',
+        success: function (List) {
+            var A = []
+            List.secondList.map(function (a) {
+                A.push({
+                    name: a.year,
+                    y: a.yTotal,
+                    drilldown: a.year
+                })
+            })
+
+            var B = []
+
+            List.firstList.map(function (a) {
+                let data = []
+                a.list.map(function (b) {
+                    data.push([b.month, b.mTotal])
+                })
+                B.push({
+                    name: a.year,
+                    id: a.year,
+                    data: data
+                })
+            })
+           
+            /*Highcharts using here.. drill down PIE CHART*/
+            Highcharts.chart('dril1', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Total <b>deposit</b> of last 5 years'
+                },
+
+                accessibility: {
+                    announceNewData: {
+                        enabled: true
+                    },
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+
+                plotOptions: {
+                    series: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.name}: {point.percentage:.1f}%'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.percentage:.2f}%</b> of total<br/><span style="color:{point.color}">{point.name} total</span>: <b>{point.y:.1f} $</b><br/>'
+                },
+
+                series: [
+                    {
+                        name: "Years",
+                        colorByPoint: true,
+                        data:A
+                    }
+                ],
+                drilldown: {
+                    series: B
+                }
+            });
+
+        },
+        Error: function (json) {
+
+        }
+        /* ajax end*/
+    })
+
+    /* Yearly deposit drildown pie*/
+    $.ajax({
+        /* ajax start*/
+        url: '/Home/Report/monthlyYearlyWithdraw',
+        type: 'GET',
+        dataType: 'JSON',
+        success: function (List) {
+            var A = []
+            List.secondList.map(function (a) {
+                A.push({
+                    name: a.year,
+                    y: a.yTotal,
+                    drilldown: a.year
+                })
+            })
+
+            var B = []
+
+            List.firstList.map(function (a) {
+                let data = []
+                a.list.map(function (b) {
+                    data.push([b.month, b.mTotal])
+                })
+                B.push({
+                    name: a.year,
+                    id: a.year,
+                    data: data
+                })
+            })
+
+            /*Highcharts using here.. drill down PIE CHART*/
+            Highcharts.chart('dril2', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Total <b>withdraw</b> of last 5 years'
+                },
+
+                accessibility: {
+                    announceNewData: {
+                        enabled: true
+                    },
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+
+                plotOptions: {
+                    series: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.name}: {point.percentage:.1f}%'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.percentage:.2f}%</b> of total<br/><span style="color:{point.color}">{point.name} total</span>: <b>{point.y:.1f} $</b><br/>'
+                },
+
+                series: [
+                    {
+                        name: "Years",
+                        colorByPoint: true,
+                        data: A
+                    }
+                ],
+                drilldown: {
+                    series: B
+                }
+            });
+
+        },
+        Error: function (json) {
+
+        }
+        /* ajax end*/
+    })
     /* document end*/
     });
 
