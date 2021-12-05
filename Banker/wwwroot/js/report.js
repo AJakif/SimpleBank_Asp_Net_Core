@@ -66,7 +66,7 @@
 
         },
         Error: function (json) {
-            
+            console.log(json)
         }
         /* ajax end*/
     })
@@ -136,7 +136,7 @@
 
         },
         Error: function (json) {
-
+            console.log(json)
         }
         /* ajax end*/
     })
@@ -217,8 +217,8 @@
             });
 
         },
-        Error: function (json) {
-
+        Error: function (yearList) {
+            console.log(yearList)
         }
         /* ajax end*/
     })
@@ -299,8 +299,8 @@
             });
 
         },
-        Error: function (json) {
-
+        Error: function (yearList) {
+            console.log(yearList)
         }
         /* ajax end*/
     })
@@ -385,8 +385,8 @@
             });
 
         },
-        Error: function (json) {
-
+        Error: function (remarkList) {
+            console.log(remarkList)
         }
         /* ajax end*/
     })
@@ -470,8 +470,8 @@
             });
 
         },
-        Error: function (json) {
-
+        Error: function (remarkList) {
+            console.log(remarkList)
         }
         /* ajax end*/
     })
@@ -552,8 +552,8 @@
             });
 
         },
-        Error: function (json) {
-
+        Error: function (List) {
+            console.log(List)
         }
         /* ajax end*/
     })
@@ -634,7 +634,7 @@
 
         },
         Error: function (json) {
-
+            console.log(List)
         }
         /* ajax end*/
     })
