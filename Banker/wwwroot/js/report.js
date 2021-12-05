@@ -306,7 +306,7 @@
     })
 
 
-    /* deposit bar*/
+    /* deposit line*/
     $.ajax({
         /* ajax start*/
         url: '/Home/Report/yearlyCatDeposit',
@@ -328,11 +328,14 @@
                 })
 
             }
+            var sYear = parseInt(remarkList[0].list[0].year);
+            var fYear = parseInt(remarkList[0].list[4].year);
+
             /*Highcharts using here.. Line CHART*/
             Highcharts.chart('linechart1', {
 
                 title: {
-                    text: 'Yearly deposit, 2017-2021'
+                    text: `Yearly deposit, ${sYear} - ${fYear}`
                 },
 
                 yAxis: {
@@ -343,7 +346,7 @@
 
                 xAxis: {
                     accessibility: {
-                        rangeDescription: 'Range: 2017 to 2021'
+                        rangeDescription: 'Range: ${sYear} to ${fYear}'
                     }
                 },
 
@@ -358,7 +361,7 @@
                         label: {
                             connectorAllowed: false
                         },
-                        pointStart: 2017
+                        pointStart: sYear
                     }
                 },
 
@@ -388,7 +391,7 @@
         /* ajax end*/
     })
 
-    /* Withdraw bar*/
+    /* Withdraw line*/
     $.ajax({
         /* ajax start*/
         url: '/Home/Report/yearlyCatWithdraw',
@@ -410,11 +413,14 @@
                 })
 
             }
+
+            var sYear = parseInt(remarkList[0].list[0].year);
+            var fYear = parseInt(remarkList[0].list[4].year);
             /*Highcharts using here.. Line CHART*/
             Highcharts.chart('linechart2', {
 
                 title: {
-                    text: 'Yearly withdraw, 2017-2021'
+                    text: `Yearly withdraw, ${sYear} - ${fYear}`
                 },
 
                 yAxis: {
@@ -425,7 +431,7 @@
 
                 xAxis: {
                     accessibility: {
-                        rangeDescription: 'Range: 2017 to 2021'
+                        rangeDescription: 'Range: ${sYear} to ${fYear}'
                     }
                 },
 
@@ -440,7 +446,7 @@
                         label: {
                             connectorAllowed: false
                         },
-                        pointStart: 2017
+                        pointStart: sYear
                     }
                 },
 
