@@ -171,8 +171,8 @@ namespace Banker.Helpers
                                 Name = dataReader["Name"].ToString(),
                                 Date = Convert.ToDateTime(dataReader["Date"]),
                                 Amount = Convert.ToDecimal(dataReader["Amount"]),
-                                Remark = dataReader["Remark"].ToString(),
-                                Type = dataReader["Type"].ToString()
+                                Source = dataReader["Remark"].ToString(),
+                                TransactionType = dataReader["Type"].ToString()
                             };
 
                             TransactionList.Add(trans);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Banker.Models.ViewModels
 {
-    public class Transection
+    public class TransectionAudit
     {
         [Key]
         public int OId { get; set; }
@@ -35,6 +35,10 @@ namespace Banker.Models.ViewModels
         [Required]
         public string TransactionType { get; set; }
 
+        [Required]
         public string Type { get; set; }
+
+        [Required]
+        public string LogType { get; set; }
     }
 }

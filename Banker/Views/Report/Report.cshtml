@@ -1,4 +1,4 @@
-﻿
+﻿@model Banker.Models.ViewModels.CollectData;
 @{
     ViewData["Title"] = "Report";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -15,85 +15,27 @@
 
 <hr />
 <div class="container">
-    <div class="row">
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="container"></div>
-                <p class="highcharts-description">
-                    Deposit Data for @DateTime.Now.ToString("MMMM")
-                </p>
-            </figure>
+    @if (Model.Transections.Count == 0)
+    {
+        <div class="col-12 text-center justify-content-center">
+            <span class="text-center text-danger">No Transaction to show. Please add a transaction!</span>
         </div>
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="container1"></div>
-                <p class="highcharts-description">
-                    Withdraw Data for @DateTime.Now.ToString("MMMM")
-                </p>
-            </figure>
-        </div>
-
-    </div>
+    }
+    else
+    {
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-primary active">
+        <input type="radio" name="options" id="option1" checked onchange="HandleChange()"> Monthly
+    </label>
+    <label class="btn btn-primary">
+        <input type="radio" name="options" id="option2" onchange="HandleChange()"> Yearly
+    </label>
+</div>
     <br />
     <br />
-    <div class="row">
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="container2"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="container3"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-    </div>
-    <br />
-    <br />
-    <div class="row">
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="linechart1"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="linechart2"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-    </div>
-    <br />
-    <br />
-    <div class="row">
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="dril1"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-        <div class="col-6 border">
-            <figure class="highcharts-figure">
-                <div id="dril2"></div>
-                <p class="highcharts-description">
-
-                </p>
-            </figure>
-        </div>
-    </div>
+<div id="report"></div>
+        
+    }
 </div>
 
 @section Scripts {

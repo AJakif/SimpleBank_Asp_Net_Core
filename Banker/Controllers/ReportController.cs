@@ -1,4 +1,6 @@
 ﻿using Banker.Extensions;
+using Banker.Helpers;
+using Banker.Models.ViewModels;
 using Banker.Models.ViewModels.ReportModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,28 +19,37 @@ namespace Banker.Controllers
     {
         private readonly ILogger<ReportController> _logger;
         private readonly IConfiguration _config;
+        private readonly ICommonHelper _helper;
 
-        public ReportController(ILogger<ReportController> logger, IConfiguration config)
+        public ReportController(ILogger<ReportController> logger, IConfiguration config, ICommonHelper helper)
         {
             _logger = logger;
             _config = config;
+            _helper = helper;
         }
 
         [Authorize]
         [Route("/Home/Report")]
         public IActionResult Report()
         {
-            return View();
+            (int id, _) = HttpContext.GetUserInfo();
+            CollectData Model = new CollectData
+            {
+                Transections = _helper.GetTransaction(id),
+                User = _helper.GetUserById(id)
+            };
+
+            return View(Model);
         }
 
         [HttpGet]
         [Authorize]
-        [Route("/Home/Report/monthlyDeposit")]
-        public JsonResult GetCurrentDeposit()
+        [Route("/Home/Report/monthlyDeposit/{month}")]
+        public JsonResult GetCurrentDeposit(int month)
         {
             List<CurrentMonthDepositViewModel> cmvmlist = new List<CurrentMonthDepositViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' AND datepart(mm, [Date]) = month(GetDate())  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
+            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -76,12 +87,12 @@ namespace Banker.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("/Home/Report/monthlyWithdraw")]
-        public JsonResult GetCurrentWithdraw()
+        [Route("/Home/Report/monthlyWithdraw/{month}")]
+        public JsonResult GetCurrentWithdraw(int month)
         {
             List<CurrentMonthWithdrawViewModel> cmvmlist = new List<CurrentMonthWithdrawViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' AND datepart(mm, [Date]) = month(GetDate()) AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
+            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {

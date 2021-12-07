@@ -82,8 +82,10 @@ namespace Banker.Controllers
                 }
                 else
                 {
-                    string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                        $"values ('{id}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Remark}','{"Withdraw"}',GETDATE(),'{wtvm.Name}')";
+                    var date = DateTime.Now;
+                    string transId = date.ToString("yyyyMMdd-HHmmssfff");
+                    string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
+                        $"values ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}',GETDATE(),'{wtvm.Name}')";
                     //If user doesn't exists it inserts data into database
                     int result = _helper.DMLTransaction(Query);
                     if (result > 0)
@@ -92,9 +94,16 @@ namespace Banker.Controllers
                         int Uresult = _helper.DMLTransaction(Uquery);
                         if (Uresult > 0)
                         {
-                            _logger.LogInformation("Withdraw completed, balance ammount updated!");
-                            _logger.LogInformation("Redicted to Balance dashboard");
-                            return RedirectToRoute("balance"); //Redirects to Home accounts index view
+                            string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
+                                            $",[Created_at],[Created_by]) VALUES ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}','{"Added"}',GETDATE(),'{wtvm.Name}')";
+                            int Iresult = _helper.DMLTransaction(Iquery);
+                            if(Iresult > 0)
+                            {
+                                _logger.LogInformation("Withdraw completed, balance ammount updated!");
+                                _logger.LogInformation("Redicted to Balance dashboard");
+                                return RedirectToRoute("balance"); //Redirects to Home accounts index view
+                            }
+                            
                         }
                     }
                 }
@@ -131,8 +140,9 @@ namespace Banker.Controllers
                     return View();
                 }
                 var date = DateTime.Now;
-                string Query = "Insert into [Transaction] (UserId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                    $"values ('{id}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Remark}','{"Deposit"}',GETDATE(),'{dtvm.Name}')";
+                string transId = date.ToString("yyyyMMdd-HHmmssfff");
+                string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
+                    $"values ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Deposit"}',GETDATE(),'{dtvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
@@ -141,9 +151,15 @@ namespace Banker.Controllers
                     int Uresult = _helper.DMLTransaction(Uquery);
                     if (Uresult > 0)
                     {
-                        _logger.LogInformation("Deposit completed, balance ammount updated!");
-                        _logger.LogInformation("Redicted to Balance dashboard");
-                        return RedirectToRoute("balance"); //Redirects to Home accounts index view
+                        string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
+                                           $",[Created_at],[Created_by]) VALUES ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Withdraw"}','{dtvm.Type}','{"Added"}',GETDATE(),'{dtvm.Name}')";
+                        int Iresult = _helper.DMLTransaction(Iquery);
+                        if (Iresult > 0)
+                        {
+                            _logger.LogInformation("Deposit completed, balance ammount updated!");
+                            _logger.LogInformation("Redicted to Balance dashboard");
+                            return RedirectToRoute("balance"); //Redirects to Home accounts index view
+                        }
                     }
                 }
             }

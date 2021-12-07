@@ -54,8 +54,8 @@ namespace Banker.Controllers
                     return View();
                 }
                 //if user exists then returns to Account controller and redirects to register view
-                string Query = "Insert into [User] (Name,Address,Gender,Phone,Email,Password,Balance,Created_at,Created_by)" +
-                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}',GETDATE(),'{rvm.Name}')";
+                string Query = "Insert into [User] (Name,Address,Gender,Role,Phone,Email,Password,Balance,Created_at,Created_by)" +
+                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','customer','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}',GETDATE(),'{rvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
@@ -105,7 +105,8 @@ namespace Banker.Controllers
                 {
                     new Claim(ClaimTypes.Email,userDetails.Email),
                     new Claim("Name", userDetails.Name),
-                    new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString()),
+                    new Claim(ClaimTypes.Role,userDetails.Role)
 
                 };
                         _logger.LogInformation("User Email, Name and Id set on claim");

@@ -1,80 +1,32 @@
 ﻿$(document).ready(function () {
-    /* document ready*/
+    const d = new Date();
+    let month = d.getMonth();
+    monthly(month);
+});
 
+function HandleChange() {
+    var s2 = document.getElementById("option2");
+    if (s2.checked == true) {
+        yearly();
+    }
+    else {
+        var month = new Date().getMonth();
+        monthly(month);
+    }
+}
+
+function MonthDepositChange(v) {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    let V = parseInt(v);
+    let a = 1;
+    var month = V + a;
     /* deposit pie*/
     $.ajax({
         /* ajax start*/
-        url: '/Home/Report/monthlyDeposit',
-        type: 'GET',
-        dataType: 'JSON',
-        success: function (json) {
-
-            var amount = []
-            var remark = []
-            
-
-            let e = eval(json);
-            var len = e.length;
-            
-            for (var i = 0; i < len; i++) {
-                amount.push(e[i].Total);
-                remark.push(e[i].Remark);
-            }
-            var A = []
-
-            for (var i = 0; i < len; i++) {
-                A.push( {
-                    name: remark[i],
-                    y: amount[i]
-                })
-            }
-                /*Highcharts using here.. PIE CHART*/
-                Highcharts.chart('container', {
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: 'All <b>deposits</b> of current month'
-                    },
-                    tooltip: {
-                        pointFormat: 'Ratio: <b>{point.percentage:.1f}%</b> <br /> {series.name}: <b>{point.y:.1f}$</b>'
-                    },
-                    accessibility: {
-                        point: {
-                            valueSuffix: '%'
-                        }
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                            }
-                        }
-                    },
-                    series: [{
-                        name: 'Total Amount',
-                        colorByPoint: true,
-                        data: A
-                    }]
-                });
-
-        },
-        Error: function (json) {
-            console.log(json)
-        }
-        /* ajax end*/
-    })
-
-    /* withdraw pie*/
-    $.ajax({
-        /* ajax start*/
-        url: '/Home/Report/monthlyWithdraw',
+        url: '/Home/Report/monthlyDeposit/' + month,
         type: 'GET',
         dataType: 'JSON',
         success: function (json) {
@@ -99,7 +51,7 @@
                 })
             }
             /*Highcharts using here.. PIE CHART*/
-            Highcharts.chart('container1', {
+            Highcharts.chart('container', {
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -107,7 +59,7 @@
                     type: 'pie'
                 },
                 title: {
-                    text: 'All <b>withdraw</b> of current month'
+                    text: `All Deposit of <b>${monthNames[v]}</b>`
                 },
                 tooltip: {
                     pointFormat: 'Ratio: <b>{point.percentage:.1f}%</b> <br /> {series.name}: <b>{point.y:.1f}$</b>'
@@ -140,6 +92,145 @@
         }
         /* ajax end*/
     })
+}
+
+function MonthWithdrawChange(v) {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    /* withdraw pie*/
+    let V = parseInt(v);
+    let a = 1;
+    var month = V + a;
+    $.ajax({
+        /* ajax start*/
+        url: '/Home/Report/monthlyWithdraw/' + month,
+        type: 'GET',
+        dataType: 'JSON',
+        success: function (json) {
+
+            var amount = []
+            var remark = []
+
+
+            let e = eval(json);
+            var len = e.length;
+
+            for (var i = 0; i < len; i++) {
+                amount.push(e[i].Total);
+                remark.push(e[i].Remark);
+            }
+            var A = []
+
+            for (var i = 0; i < len; i++) {
+                A.push({
+                    name: remark[i],
+                    y: amount[i]
+                })
+            }
+            /*Highcharts using here.. PIE CHART*/
+            Highcharts.chart('container1', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: `All Withdraw of <b>${monthNames[v]}</b>`
+                },
+                tooltip: {
+                    pointFormat: 'Ratio: <b>{point.percentage:.1f}%</b> <br /> {series.name}: <b>{point.y:.1f}$</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Total Amount',
+                    colorByPoint: true,
+                    data: A
+                }]
+            });
+
+        },
+        Error: function (json) {
+            console.log(json)
+        }
+        /* ajax end*/
+    })
+}
+
+function yearly() {
+    document.getElementById("report").innerHTML = `<div class="row">
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="container2"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="container3"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="linechart1"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="linechart2"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="row">
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="dril1"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+            <div class="col-6 border">
+                <figure class="highcharts-figure">
+                    <div id="dril2"></div>
+                    <p class="highcharts-description">
+
+                    </p>
+                </figure>
+            </div>
+        </div>`
 
     /* withdraw bar*/
     $.ajax({
@@ -149,20 +240,20 @@
         dataType: 'JSON',
         success: function (yearList) {
             var A = []
-            
+
             for (var i = 0; i < yearList.length; i++) {
                 var total = [];
                 let year;
                 year = yearList[i].year;
-                for (var j = 0; j < yearList[i].list.length; j ++) {
-                    
+                for (var j = 0; j < yearList[i].list.length; j++) {
+
                     total.push(yearList[i].list[j].total)
                 }
                 A.push({
-                    name:year,
+                    name: year,
                     data: total
                 })
-                
+
             }
             /*Highcharts using here.. PIE CHART*/
             Highcharts.chart('container3', {
@@ -317,7 +408,7 @@
 
             for (var i = 0; i < remarkList.length; i++) {
                 var total = [];
-                let remark  = remarkList[i].remark;
+                let remark = remarkList[i].remark;
                 for (var j = 0; j < remarkList[i].list.length; j++) {
 
                     total.push(remarkList[i].list[j].total)
@@ -506,7 +597,7 @@
                     data: data
                 })
             })
-           
+
             /*Highcharts using here.. drill down PIE CHART*/
             Highcharts.chart('dril1', {
                 chart: {
@@ -543,7 +634,7 @@
                     {
                         name: "Years",
                         colorByPoint: true,
-                        data:A
+                        data: A
                     }
                 ],
                 drilldown: {
@@ -638,7 +729,63 @@
         }
         /* ajax end*/
     })
-    /* document end*/
-    });
+}
 
 
+function monthly(m) {
+
+    document.getElementById("report").innerHTML = `<div class="row" >
+                                                            <div class= "col-6 border" id="deposit" >
+                                                                <figure class="highcharts-figure" >
+                                                                    <div id="container"></div>
+                                                                    <p class="highcharts-description">
+                                                                        <select class="custom-select col-4" id="inputGroupSelect01" onchange="MonthDepositChange(this.value)">
+                                                                            <option selected>Choose...</option>
+                                                                            <option value="0">January</option>
+                                                                            <option value="1">February</option>
+                                                                            <option value="2">March</option>
+                                                                            <option value="3">April</option>
+                                                                            <option value="4">May</option>
+                                                                            <option value="5">June</option>
+                                                                            <option value="6">July</option>
+                                                                            <option value="7">August</option>
+                                                                            <option value="8">September</option>
+                                                                            <option value="9">October</option>
+                                                                            <option value="10">November</option>
+                                                                            <option value="11">December</option>
+                                                                        </select>
+                                                                       
+                                                                    </p>
+                                                                </figure>
+                                                            </div >
+                                                            <div class="col-6 border">
+                                                                <figure class="highcharts-figure" id="withdraw">
+                                                                    <div id="container1"></div>
+                                                                    <p class="highcharts-description">
+                                                                       <select class="custom-select col-4" id="inputGroupSelect01" onchange="MonthWithdrawChange(this.value)">
+                                                                            <option selected>Choose...</option>
+                                                                            <option value="0">January</option>
+                                                                            <option value="1">February</option>
+                                                                            <option value="2">March</option>
+                                                                            <option value="3">April</option>
+                                                                            <option value="4">May</option>
+                                                                            <option value="5">June</option>
+                                                                            <option value="6">July</option>
+                                                                            <option value="7">August</option>
+                                                                            <option value="8">September</option>
+                                                                            <option value="9">October</option>
+                                                                            <option value="10">November</option>
+                                                                            <option value="11">December</option>
+                                                                        </select>
+                                                                    </p>
+                                                                </figure>
+                                                            </div>
+                                                        </div >`
+
+    
+    /* deposit pie*/
+    MonthDepositChange(m)
+
+    /* withdraw pie*/
+    MonthWithdrawChange(m)
+}

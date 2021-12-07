@@ -14,6 +14,8 @@ namespace Banker.Models.ViewModels
         public string Name { get; set; } 
         public string Address { get; set; }
         public string Gender { get; set; }
+
+        public string Role { get; set; }
         [Required]
         public string Phone { get; set; }
         [Required]
