@@ -9,5 +9,6 @@ namespace Banker.Models.ViewModels
         public List<Transection> Transections { get; set; }
 
         public UserViewModel User { get; set; }
+        public Transection Transection { get; set; }
     }
 }

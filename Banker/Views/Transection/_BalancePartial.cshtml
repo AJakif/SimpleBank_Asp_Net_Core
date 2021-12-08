@@ -1,0 +1,66 @@
+﻿@model Banker.Models.ViewModels.CollectData;
+<div class="modal fade" tabindex="-1" role="dialog" id="EditRecord">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Record</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="Balance">
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="Transection.OId" id="id" class="form-control" hidden />
+                    <div class="form-group">
+                        <label asp-for="Transection.TransId" class="control-label"></label>
+                        <input asp-for="Transection.TransId" id="transId" class="form-control" readonly />
+                        <span asp-validation-for="Transection.TransId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.Name" class="control-label"></label>
+                        <input asp-for="Transection.Name" id="name" class="form-control" readonly />
+                        <span asp-validation-for="Transection.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.Date" class="control-label"></label>
+                        <input asp-for="Transection.Date" id="date" class="form-control" readonly />
+                        <span asp-validation-for="Transection.Date" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.Amount" class="control-label"></label>
+                        <input asp-for="Transection.Amount" id="amount" class="form-control" readonly />
+                        <span asp-validation-for="Transection.Amount" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.TransactionType" class="control-label"></label>
+                        <input asp-for="Transection.TransactionType" id="transactionType" class="form-control" readonly />
+                        <span asp-validation-for="Transection.TransactionType" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.Source" class="control-label">Source Type</label>
+                        <select class="form-control" asp-for="Transection.Source" id="source" onchange="HandleChange(this.id,'type','transactionType')">
+                        </select>
+                        <span asp-validation-for="Transection.Source" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Transection.Type" class="control-label">Source Type</label>
+                        <select class="form-control" asp-for="Transection.Type" id="type">
+                        </select>
+                        <span asp-validation-for="Transection.Type" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/balance.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

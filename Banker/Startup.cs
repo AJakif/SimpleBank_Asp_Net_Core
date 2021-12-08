@@ -126,6 +126,12 @@ namespace Banker
                     pattern: "Home/Report",
                     defaults: new { controller = "Report", action = "Report", });
 
+                endpoints.MapControllerRoute(
+                    name: "audit",
+                    pattern: "Home/Audit",
+                    defaults: new { controller = "Audit", action = "Index", });
+
+
 
 
                 endpoints.MapRazorPages();

@@ -24,7 +24,7 @@
 <br />
 <div class="row">
     <div class="col-sm-2">
-        <b>Balance :</b><input class="form-control disabled form-inline" value="@Model.User.Balance$" readonly/>
+        <b>Balance :</b><input class="form-control disabled form-inline" value="@Model.User.Balance$" readonly />
     </div>
 </div>
 <br />
@@ -39,9 +39,12 @@
             <tr>
                 <th>Name</th>
                 <th>Amount</th>
+                <th>Transaction Id</th>
                 <th>Transaction Date & Time</th>
                 <th>Transaction Type</th>
-                <th>Remark</th>
+                <th>Source</th>
+                <th>Type</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -57,20 +60,45 @@
                 {
                     <tr>
                         <td>@trans.Name</td>
-                        @if (trans.Type == "Withdraw")
+
+                        @if (trans.TransactionType == "Withdraw")
                         {
                             <td class="text-left"><span style="color:red">- @trans.Amount$</span></td>
                         }
-                        @if (trans.Type == "Deposit")
+                        @if (trans.TransactionType == "Deposit")
                         {
                             <td class="text-left"><span style="color: green">+@trans.Amount$</span></td>
                         }
+                        <td>@trans.TransId</td>
                         <td>@trans.Date</td>
+                        <td>@trans.TransactionType</td>
+                        <td>@trans.Source</td>
                         <td>@trans.Type</td>
-                        <td>@trans.Remark</td>
+                        <td>
+                            <div class="text-center">
+                                <a class="btn btn-success text-white edit" style="cursor:pointer; width:100px;" data-toggle="modal" data-target="#EditRecord" data-id="@trans.OId">
+                                    <i class='far fa-edit'></i> Edit
+                                </a>
+                                <a onclick=Delete("/Home/Transaction/Delete/@trans.OId") class="btn btn-danger text-white" style="cursor:pointer; width:100px;">
+                                    <i class='far fa-trash-alt'></i> Delete
+                                </a>
+                            </div>
+                        </td>
+
                     </tr>
                 }
             }
         </tbody>
     </table>
 </div>
+
+
+
+    <partial name="_BalancePartial.cshtml" />
+
+
+
+@section Scripts {
+    <script src="~/js/balance.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

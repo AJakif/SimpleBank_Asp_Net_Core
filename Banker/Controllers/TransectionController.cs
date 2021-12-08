@@ -35,12 +35,113 @@ namespace Banker.Controllers
         {
             (int id, _) = HttpContext.GetUserInfo();
             CollectData Model = new CollectData
-                {
-                    Transections = _helper.GetTransaction(id),
-                    User = _helper.GetUserById(id)
-                };
+            {
+                Transections = _helper.GetTransactionList(id),
+                User = _helper.GetUserById(id)
+            };
             _logger.LogInformation("Entered in Balance Dashboard");
             return View(Model);
+        }
+
+
+        [HttpGet]
+        [Route("Home/Transaction/GetAll")]
+        [Authorize]
+        public IActionResult GetAll()
+        {
+            (int id, _) = HttpContext.GetUserInfo();
+
+            var Transections = _helper.GetTransactionList(id);
+            
+            return Json(new { data = Transections });
+        }
+
+        [HttpPost]
+        [Route("/Home/Transaction/Edit")]
+        public JsonResult Edit(int id)
+        {
+            var transection = _helper.GetTransaction(id);
+            return Json (transection);
+
+        }
+
+        [HttpPost]
+        public IActionResult Balance(CollectData collect)
+        {
+            try
+            {
+                string Query = $"UPDATE[dbo].[Transaction] SET [Source] = '{collect.Transection.Source}' ,[Type] = '{collect.Transection.Type}' ,[Updated_at] = GETDATE() ,[Updated_by] = '{collect.Transection.Name}' " +
+            $"WHERE OId = '{collect.Transection.OId}'";
+                int Uresult = _helper.DMLTransaction(Query);
+                if (Uresult > 0)
+                {
+                    (int id, _) = HttpContext.GetUserInfo();
+                    string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
+                                    $",[Created_at],[Created_by]) VALUES ('{id}','{collect.Transection.TransId}','{collect.Transection.Name}',GETDATE(),'{collect.Transection.Amount}','{collect.Transection.Source}','{collect.Transection.TransactionType}','{collect.Transection.Type}','{"Edited"}',GETDATE(),'{collect.Transection.Name}')";
+                    int Iresult = _helper.DMLTransaction(Iquery);
+                    if (Iresult > 0)
+                    {
+                        
+                        CollectData Model = new CollectData
+                        {
+                            Transections = _helper.GetTransactionList(id),
+                            User = _helper.GetUserById(id)
+                        };
+                        return View(Model);
+                    }
+                    else
+                    {
+                        ViewBag.Error = "Audit insertion error";
+                        RedirectToRoute("balance");
+                    }
+                }
+                else
+                {
+                    ViewBag.Error = "Error while Update transaction.";
+                    RedirectToRoute("balance");
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                ViewBag.Error = "Error while Edit, please try again!";
+                _logger.LogInformation($"'{e}' Exception..");
+            }
+            return View();
+        }
+
+        [HttpDelete]
+        [Route("/Home/Transaction/Delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            var transection = _helper.GetTransaction(id);
+            try
+            {
+                string Query = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
+                                    $",[Created_at],[Created_by]) VALUES ('{transection.UserId}','{transection.TransId}','{transection.Name}',GETDATE(),'{transection.Amount}','{transection.Source}','{transection.TransactionType}','{transection.Type}','{"Deleted"}',GETDATE(),'{transection.Name}')";
+                
+                int Uresult = _helper.DMLTransaction(Query);
+                if (Uresult > 0)
+                {
+                    string Iquery = $"DELETE FROM [dbo].[Transaction]  WHERE OId = '{transection.OId}' ";
+                    int Iresult = _helper.DMLTransaction(Iquery);
+                    if (Iresult > 0)
+                    {
+                        return Json(new { success = true, message = "Transaction Deleted successful" });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Error while Deleting transaction." });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Error while insert into audit table." });
+                }
+            }
+            catch (NullReferenceException)
+            {
+                return Json(new { success = false, message = "Error while Delete, please try again!" });
+            }
         }
 
         [HttpGet]

@@ -86,14 +86,6 @@ namespace Banker.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(lvm.Email) && string.IsNullOrEmpty(lvm.Password))
-                {
-                    ViewBag.Error = "Email & Password are empty";
-                    _logger.LogInformation("Email & Password input are empty");
-                    return View();
-                }
-                else
-                {
                     string query = $"select * from [User] where Email='{lvm.Email}' and Password='{lvm.Password}'";
                     _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
                     UserViewModel userDetails = _helper.GetUserByEmail(query);
@@ -102,13 +94,13 @@ namespace Banker.Controllers
                     if (userDetails != null && userDetails.Email != null) //all data should be null checked
                     {
                         var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email,userDetails.Email),
-                    new Claim("Name", userDetails.Name),
-                    new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString()),
-                    new Claim(ClaimTypes.Role,userDetails.Role)
+                        {
+                            new Claim(ClaimTypes.Email,userDetails.Email),
+                            new Claim("Name", userDetails.Name),
+                            new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString()),
+                            new Claim(ClaimTypes.Role,userDetails.Role)
 
-                };
+                        };
                         _logger.LogInformation("User Email, Name and Id set on claim");
                         var identity = new ClaimsIdentity(
                             claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -145,7 +137,7 @@ namespace Banker.Controllers
                         ViewBag.Error = "Wrong Email & Password, please try again";
                         return View();
                     }
-                }
+                
             }
             catch(NullReferenceException e)
             {

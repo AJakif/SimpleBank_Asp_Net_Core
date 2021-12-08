@@ -22,7 +22,7 @@
 
             <div class="form-group">
                 <label asp-for="Name" class="control-label">Dipositor Name</label><span style="color:red">*</span>
-                <input asp-for="Name" type="text" class="form-control"  onkeyup="lettersOnly(this)" />
+                <input asp-for="Name" type="text" class="form-control" onkeyup="lettersOnly(this)" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -31,8 +31,8 @@
                 <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Remark" class="control-label">Source</label><span style="color:red">*</span>
-                <select class="form-control" asp-for="Remark" name="Remark">
+                <label asp-for="Source" class="control-label">Source</label><span style="color:red">*</span>
+                <select class="form-control" asp-for="Source" onchange="HandleDeposit(this.id,'slct2')">
                     <option selected>..Please select..</option>
                     <option value="Income">Income</option>
                     <option value="Gift">Gift</option>
@@ -40,7 +40,13 @@
                     <option value="Business">Business</option>
                     <option value="Other">Other</option>
                 </select>
-                <span asp-validation-for="Remark" class="text-danger"></span>
+                <span asp-validation-for="Source" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label">Source Type</label>
+                <select class="form-control" asp-for="Type" id="slct2">
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Deposit" class="btn btn-primary" />

@@ -16,8 +16,13 @@ namespace Banker.Helpers
         
         bool UserAlreadyExists(string query);
         
-        List<Transection> GetTransaction(int id);
-        
+        List<Transection> GetTransactionList(int id);
+
+        Transection GetTransaction(int id);
+
+        AuditViewModel GetAudit( string query);
+
+
         HistoryViewModel GetHistory(int id);
     }
 }

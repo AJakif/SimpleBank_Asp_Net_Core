@@ -47,6 +47,7 @@ namespace Banker.Helpers
                             user.Email = dataReader["Email"].ToString();
                             user.Password = dataReader["Password"].ToString();
                             user.Balance = Convert.ToDecimal(dataReader["Balance"]);
+                            user.Role = dataReader["Role"].ToString();
 
                         }
                     }
@@ -148,7 +149,57 @@ namespace Banker.Helpers
 
         }
 
-        public List<Transection> GetTransaction(int id)
+        public AuditViewModel GetAudit(string query)
+        {
+            List<AuditViewModel> avml = new List<AuditViewModel>();
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    while (dataReader.Read()) //make it single user
+                    {
+                        try
+                        {
+                            if (dataReader != null)
+                            {
+                                AuditViewModel avm = new AuditViewModel()
+                                {
+                                    OId = Convert.ToInt32(dataReader["OId"]),
+                                    UserId = Convert.ToInt32(dataReader["UserId"]),
+                                    TransId = dataReader["TransId"].ToString(),
+                                    Name = dataReader["Name"].ToString(),
+                                    Date = Convert.ToString(dataReader["Date"]) ,
+                                    Amount = Convert.ToDecimal(dataReader["Amount"]),
+                                    Source = dataReader["Source"].ToString(),
+                                    TransactionType = dataReader["TransactionType"].ToString(),
+                                    Type = dataReader["Type"].ToString(),
+                                    LogType = dataReader["LogType"].ToString()
+                                };
+
+                                avml.Add(avm);
+                            }
+                        }
+                        catch (NullReferenceException e)
+                        {
+                            _logger.LogError($"'{e}' Exception");
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            AuditViewModel obj = new AuditViewModel
+            {
+                AuditList = avml
+            };
+
+            return obj;
+        }
+        public List<Transection> GetTransactionList(int id)
         {
             List<Transection> TransactionList = new List<Transection>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -168,11 +219,13 @@ namespace Banker.Helpers
                             {
                                 OId = Convert.ToInt32(dataReader["OId"]),
                                 UserId = Convert.ToInt32(dataReader["UserId"]),
+                                TransId = dataReader["TransId"].ToString(),
                                 Name = dataReader["Name"].ToString(),
                                 Date = Convert.ToDateTime(dataReader["Date"]),
                                 Amount = Convert.ToDecimal(dataReader["Amount"]),
-                                Source = dataReader["Remark"].ToString(),
-                                TransactionType = dataReader["Type"].ToString()
+                                Source = dataReader["Source"].ToString(),
+                                TransactionType = dataReader["TransactionType"].ToString(),
+                                Type = dataReader["Type"].ToString()
                             };
 
                             TransactionList.Add(trans);
@@ -188,6 +241,51 @@ namespace Banker.Helpers
                 connection.Close();
             }
             return (TransactionList);
+        }
+
+        public Transection GetTransaction(int id)
+        {
+            CollectData collect = new CollectData();
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = $"SELECT [OId] ,[UserId] ,[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type] " +
+                $"FROM [Transaction] WHERE [OId] = '{id}'";
+                string sql = query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    try
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            Transection t = new Transection
+                            {
+                                OId = Convert.ToInt32(dataReader["OId"]),
+                                UserId = Convert.ToInt32(dataReader["UserId"]),
+                                TransId = dataReader["TransId"].ToString(),
+                                Name = dataReader["Name"].ToString(),
+                                Date = Convert.ToDateTime(dataReader["Date"]),
+                                Amount = Convert.ToDecimal(dataReader["Amount"]),
+                                Source = dataReader["Source"].ToString(),
+                                TransactionType = dataReader["TransactionType"].ToString(),
+                                Type = dataReader["Type"].ToString()
+                            };
+
+                            collect.Transection = t;
+                        }
+                        
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        _logger.LogWarning($"'{e}' Exception");
+                    }
+
+                }
+                connection.Close();
+            }
+            return (collect.Transection);
         }
 
         public HistoryViewModel GetHistory(int id)

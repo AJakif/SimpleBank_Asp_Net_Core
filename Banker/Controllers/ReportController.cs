@@ -35,7 +35,7 @@ namespace Banker.Controllers
             (int id, _) = HttpContext.GetUserInfo();
             CollectData Model = new CollectData
             {
-                Transections = _helper.GetTransaction(id),
+                Transections = _helper.GetTransactionList(id),
                 User = _helper.GetUserById(id)
             };
 
@@ -49,7 +49,7 @@ namespace Banker.Controllers
         {
             List<CurrentMonthDepositViewModel> cmvmlist = new List<CurrentMonthDepositViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
+            var query = $"SELECT SUM([Amount])AS Total,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Deposit' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Source] ORDER BY [Source]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -66,7 +66,7 @@ namespace Banker.Controllers
                             CurrentMonthDepositViewModel cmvm = new CurrentMonthDepositViewModel
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(cmvm);
@@ -92,7 +92,7 @@ namespace Banker.Controllers
         {
             List<CurrentMonthWithdrawViewModel> cmvmlist = new List<CurrentMonthWithdrawViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Remark] ORDER BY [Remark]";
+            var query = $"SELECT SUM([Amount])AS Total,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Withdraw' AND[UserId] = '{id}' AND Month([Date]) = '{month}'  AND datepart(yy, [Date]) = year(GetDate()) GROUP BY [Source] ORDER BY [Source]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -109,7 +109,7 @@ namespace Banker.Controllers
                             CurrentMonthWithdrawViewModel cmvm = new CurrentMonthWithdrawViewModel
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(cmvm);
@@ -135,8 +135,8 @@ namespace Banker.Controllers
         {
             List<YearlyWithdrawViewModel> cmvmlist = new List<YearlyWithdrawViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY "+
-                "DATENAME(yy, [Date]),[Remark]  ORDER BY DATENAME(yy, [Date]),[Remark]";
+            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Withdraw' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY "+
+                "DATENAME(yy, [Date]),[Source]  ORDER BY DATENAME(yy, [Date]),[Source]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -154,7 +154,7 @@ namespace Banker.Controllers
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
                                 Year = dataReader["_Year"].ToString(),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(ywvm);
@@ -191,8 +191,8 @@ namespace Banker.Controllers
         {
             List<YearlyDepositViewModel> cmvmlist = new List<YearlyDepositViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
-                "DATENAME(yy, [Date]),[Remark]  ORDER BY DATENAME(yy, [Date]),[Remark]";
+            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Deposit' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
+                "DATENAME(yy, [Date]),[Source]  ORDER BY DATENAME(yy, [Date]),[Source]";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -210,7 +210,7 @@ namespace Banker.Controllers
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
                                 Year = dataReader["_Year"].ToString(),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(ywvm);
@@ -247,8 +247,8 @@ namespace Banker.Controllers
         {
             List<YearlyDepositCatViewModel> cmvmlist = new List<YearlyDepositCatViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
-                "[Remark], DATENAME(yy, [Date])  ORDER BY [Remark], DATENAME(yy, [Date])";
+            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Deposit' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
+                "[Source], DATENAME(yy, [Date])  ORDER BY [Source], DATENAME(yy, [Date])";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -266,7 +266,7 @@ namespace Banker.Controllers
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
                                 Year = dataReader["_Year"].ToString(),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(ywvm);
@@ -302,8 +302,8 @@ namespace Banker.Controllers
         {
             List<YearlyWithdrawCatViewModel> cmvmlist = new List<YearlyWithdrawCatViewModel>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
-            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Remark] FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
-                "[Remark], DATENAME(yy, [Date])  ORDER BY [Remark], DATENAME(yy, [Date])";
+            var query = $"SELECT SUM([Amount])AS Total , DATENAME(yy, [Date]) AS _Year ,[Source] FROM[dbo].[Transaction] WHERE[TransactionType] = 'Withdraw' AND[UserId] = '{id}' AND[Date] >= DATEADD(year, -5, GETDATE()) GROUP BY " +
+                "[Source], DATENAME(yy, [Date])  ORDER BY [Source], DATENAME(yy, [Date])";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -321,7 +321,7 @@ namespace Banker.Controllers
                             {
                                 Total = Convert.ToDecimal(dataReader["Total"]),
                                 Year = dataReader["_Year"].ToString(),
-                                Remark = dataReader["Remark"].ToString()
+                                Remark = dataReader["Source"].ToString()
                             };
 
                             cmvmlist.Add(ywvm);
@@ -360,14 +360,14 @@ namespace Banker.Controllers
             List<Monthly> mlist = new List<Monthly>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
 
-            var yquery = $"SELECT SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' GROUP BY DATENAME(yy, [Date]) ORDER BY " +
+            var yquery = $"SELECT SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year FROM[dbo].[Transaction] WHERE[TransactionType] = 'Deposit' AND[UserId] = '{id}' GROUP BY DATENAME(yy, [Date]) ORDER BY " +
             "DATENAME(yy, [Date])";
 
             var mquery = "SELECT CASE { fn MONTH([Date]) } " +
             "when 1 then 'January' when 2 then 'February' when 3 then 'March' when 4 then 'April' when 5 then 'May'" +
             "when 6 then 'June'  when 7 then 'July' when 8 then 'August' when 9 then 'September' when 10 then 'October'" +
             "when 11 then 'November' when 12 then 'December' END AS _Month,  SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year " +
-            $"FROM[dbo].[Transaction] WHERE[Type] = 'Deposit' AND[UserId] = '{id}' GROUP BY  DATENAME(yy, [Date]), " +
+            $"FROM[dbo].[Transaction] WHERE[TransactionType] = 'Deposit' AND[UserId] = '{id}' GROUP BY  DATENAME(yy, [Date]), " +
             "{ fn MONTH([Date]) } ORDER BY  DATENAME(yy, [Date]), { fn MONTH([Date]) }";
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -461,14 +461,14 @@ namespace Banker.Controllers
             List<WMonthly> mlist = new List<WMonthly>();
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
 
-            var yquery = $"SELECT SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' GROUP BY DATENAME(yy, [Date]) ORDER BY " +
+            var yquery = $"SELECT SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year FROM[dbo].[Transaction] WHERE[TransactionType] = 'Withdraw' AND[UserId] = '{id}' GROUP BY DATENAME(yy, [Date]) ORDER BY " +
             "DATENAME(yy, [Date])";
 
             var mquery = "SELECT CASE { fn MONTH([Date]) } "+ 
             "when 1 then 'January' when 2 then 'February' when 3 then 'March' when 4 then 'April' when 5 then 'May'"+
             "when 6 then 'June'  when 7 then 'July' when 8 then 'August' when 9 then 'September' when 10 then 'October'"+
             "when 11 then 'November' when 12 then 'December' END AS _Month,  SUM([Amount])AS Total, DATENAME(yy, [Date]) AS _Year " +
-            $"FROM[dbo].[Transaction] WHERE[Type] = 'Withdraw' AND[UserId] = '{id}' GROUP BY  DATENAME(yy, [Date]), "+
+            $"FROM[dbo].[Transaction] WHERE[TransactionType] = 'Withdraw' AND[UserId] = '{id}' GROUP BY  DATENAME(yy, [Date]), "+
             "{ fn MONTH([Date]) } ORDER BY  DATENAME(yy, [Date]), { fn MONTH([Date]) }";
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
