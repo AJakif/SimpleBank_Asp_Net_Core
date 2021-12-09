@@ -46,10 +46,32 @@ namespace Banker.Controllers
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("/Home/Audit/TType/{type}")]
-        public JsonResult GetByTransType(int type)
+        public JsonResult GetByTransType(string type)
         {
             string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
             $"FROM[dbo].[TansactionAudit] WHERE[TransactionType] = '{type}'";
+            var audit = _helper.GetAudit(query);
+            return Json(new { data = audit.AuditList });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "admin")]
+        [Route("/Home/Audit/LogType/{type}")]
+        public JsonResult GetByLogType(string type)
+        {
+            string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
+            $"FROM[dbo].[TansactionAudit] WHERE[LogType] = '{type}'";
+            var audit = _helper.GetAudit(query);
+            return Json(new { data = audit.AuditList });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "admin")]
+        [Route("/Home/Audit/Date/{date}")]
+        public JsonResult GetByDate(string date)
+        {
+            string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
+            $"FROM[dbo].[TansactionAudit] WHERE CONVERT(VARCHAR(10), [Date], 23) = '{date}'";
             var audit = _helper.GetAudit(query);
             return Json(new { data = audit.AuditList });
         }

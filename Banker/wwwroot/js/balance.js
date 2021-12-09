@@ -19,7 +19,9 @@
                 console.log(response.source)
                 var type = response.transactionType;
                 var s1 = document.getElementById("source");
+                var s2 = document.getElementById("type");
                 s1.innerHTML = "";
+                s2.innerHTML = "";
                 if (type == "Withdraw") {
 
                     var optionArray = ['Medical', 'Grocery', 'Shopping', 'Travel', 'Education', 'Other'];
@@ -33,6 +35,31 @@
                         newOption.innerHTML = optionArray[option];
                         s1.options.add(newOption);
                     }
+                    if (s1.value == "Shopping") {
+                        var options = ['Cloth', 'Jwelery'];
+                    }
+                    else if (s1.value == "Medical") {
+                        var options = ['Checkup', 'Medicine', 'Operation'];
+                    }
+                    else if (s1.value == "Education") {
+                        var options = ['Tution fee', 'Books'];
+                    }
+                    else if (s1.value == "Travel") {
+                        var options = ['Flight', 'Hotel', 'Visa'];
+                    }
+                    else if (s1.value == "Other") {
+                        var options = ['Passport fee', 'Hotel', 'Visa'];
+                    }
+                    for (var option in options) {
+                        var newOption = document.createElement("option");
+                        if (optionArray[option] == response.type) {
+                            newOption.selected = response.type;
+                        }
+                        newOption.value = options[option];
+                        newOption.innerHTML = options[option];
+                        s2.options.add(newOption);
+                    }
+
                 }
                 else if (type == "Deposit") {
 
@@ -47,6 +74,24 @@
                         newOption.value = optionArray[option];
                         newOption.innerHTML = optionArray[option];
                         s1.options.add(newOption);
+                    }
+                    if (s1.value == "Gift") {
+                        var options = ['Personal', 'Organizational'];
+                    }
+                    else if (s1.value == "Business") {
+                        var options = ['Profit', 'Donation'];
+                    }
+                    else if (s1.value == "Income") {
+                        var options = ['Monthly', 'Yearly'];
+                    }
+                    for (var option in options) {
+                        var newOption = document.createElement("option");
+                        if (optionArray[option] == response.type) {
+                            newOption.selected = response.type;
+                        }
+                        newOption.value = options[option];
+                        newOption.innerHTML = options[option];
+                        s2.options.add(newOption);
                     }
                 }
             }

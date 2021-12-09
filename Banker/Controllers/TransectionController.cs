@@ -242,8 +242,8 @@ namespace Banker.Controllers
                 }
                 var date = DateTime.Now;
                 string transId = date.ToString("yyyyMMdd-HHmmssfff");
-                string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Remark,Type,Created_at,Created_by)" +
-                    $"values ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Deposit"}',GETDATE(),'{dtvm.Name}')";
+                string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
+                    $"values ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Deposit"}','{dtvm.Type}',GETDATE(),'{dtvm.Name}')";
                 //If user doesn't exists it inserts data into database
                 int result = _helper.DMLTransaction(Query);
                 if (result > 0)
