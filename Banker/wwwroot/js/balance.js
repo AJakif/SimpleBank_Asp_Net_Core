@@ -47,9 +47,7 @@
                     else if (s1.value == "Travel") {
                         var options = ['Flight', 'Hotel', 'Visa'];
                     }
-                    else if (s1.value == "Other") {
-                        var options = ['Passport fee', 'Hotel', 'Visa'];
-                    }
+                    
                     for (var option in options) {
                         var newOption = document.createElement("option");
                         if (optionArray[option] == response.type) {
@@ -163,9 +161,7 @@ function HandleChange(s1, s2, s3) {
         else if (s1.value == "Travel") {
             var optionArray = ['Flight', 'Hotel', 'Visa'];
         }
-        else if (s1.value == "Other") {
-            var optionArray = ['Passport fee', 'Hotel', 'Visa'];
-        }
+       
 
 
 
