@@ -1,6 +1,6 @@
 ﻿using Banker.Extensions;
-using Banker.Helpers;
 using Banker.Models.ViewModels;
+using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +22,15 @@ namespace Banker.Controllers
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _config;
-        private readonly ICommonHelper _helper;
+        private readonly IUserRepository _user;
+        private readonly ILoginHistoryRepository _login;
 
-        public AccountController(ILogger<AccountController> logger, IConfiguration config, ICommonHelper helper)
+        public AccountController(ILogger<AccountController> logger, IConfiguration config, IUserRepository user, ILoginHistoryRepository login)
         {
             _logger = logger;
             _config = config;
-            _helper = helper;
+            _user = user;
+            _login = login;
         }
 
         [HttpGet]
@@ -45,19 +47,17 @@ namespace Banker.Controllers
             _logger.LogInformation("The Register Post methhod has been called");
             try
             {
-                string UserExistsQuery = $"Select * from [User] where Name='{rvm.Name}'" + $"OR Email = '{rvm.Email}'"; //Query for user existence
-                bool userExists = _helper.UserAlreadyExists(UserExistsQuery);
+                 //Query for user existence
+                bool userExists = _user.UserAlreadyExists(rvm);
 
                 if (userExists == true)
                 {
                     ViewBag.Error = "Name and Email Already Exists";
                     return View();
                 }
-                //if user exists then returns to Account controller and redirects to register view
-                string Query = "Insert into [User] (Name,Address,Gender,Role,Phone,Email,Password,Balance,Created_at,Created_by)" +
-                    $"values ('{rvm.Name}','{rvm.Address}','{rvm.Gender}','customer','{rvm.Phone}','{rvm.Email}','{rvm.Password}','{100}',GETDATE(),'{rvm.Name}')";
+               
                 //If user doesn't exists it inserts data into database
-                int result = _helper.DMLTransaction(Query);
+                int result = _user.Register(rvm);
                 if (result > 0)
                 {
                     _logger.LogInformation("User data Inserted");
@@ -86,9 +86,8 @@ namespace Banker.Controllers
         {
             try
             {
-                    string query = $"select * from [User] where Email='{lvm.Email}' and Password='{lvm.Password}'";
-                    _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
-                    UserViewModel userDetails = _helper.GetUserByEmail(query);
+                   
+                    UserViewModel userDetails = _user.GetUserByEmail(lvm);
                     _logger.LogInformation($"Userdetails '{userDetails}'");
 
                     if (userDetails != null && userDetails.Email != null) //all data should be null checked
@@ -117,8 +116,7 @@ namespace Banker.Controllers
 
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
                         
-                        string Query = "Insert into [LoginHistory] (UserId,DateTime,Created_at,Created_by)" + $"values ('{userDetails.OId}',GETDATE(),GETDATE(),(SELECT Name FROM[User] WHERE OId = '{userDetails.OId}'))";
-                        int result = _helper.DMLTransaction(Query);
+                        int result = _login.LoginHistory(userDetails);
                         
                         if (result > 0)
                         {
@@ -155,7 +153,7 @@ namespace Banker.Controllers
 
             _logger.LogInformation("The Login Dashboard page has been accessed");
 
-            HistoryViewModel hvm = _helper.GetHistory(id);
+            HistoryViewModel hvm = _login.GetHistory(id);
             return View(hvm);
         }
 

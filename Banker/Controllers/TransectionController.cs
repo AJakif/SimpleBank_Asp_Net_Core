@@ -1,6 +1,6 @@
 ﻿using Banker.Extensions;
-using Banker.Helpers;
 using Banker.Models.ViewModels;
+using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +18,18 @@ namespace Banker.Controllers
     public class TransectionController : Controller
     {
         private readonly IConfiguration _config;
-        private readonly ICommonHelper _helper;
         private readonly ILogger<TransectionController> _logger;
+        private readonly ITransactionRepository _transaction;
+        private readonly IAuditRepository _audit;
+        private readonly IUserRepository _user;
 
-        public TransectionController(IConfiguration config, ICommonHelper helper, ILogger<TransectionController> logger)
+        public TransectionController(IConfiguration config, ILogger<TransectionController> logger, ITransactionRepository transaction, IAuditRepository audit, IUserRepository user)
         {
             _config = config;
-            _helper = helper;
             _logger = logger;
+            _transaction = transaction;
+            _audit = audit;
+            _user = user;
         }
 
         [HttpGet]
@@ -36,8 +40,8 @@ namespace Banker.Controllers
             (int id, _) = HttpContext.GetUserInfo();
             CollectData Model = new CollectData
             {
-                Transections = _helper.GetTransactionList(id),
-                User = _helper.GetUserById(id)
+                Transections = _transaction.GetTransactionList(id),
+                User = _user.GetUserById(id)
             };
             _logger.LogInformation("Entered in Balance Dashboard");
             return View(Model);
@@ -51,7 +55,7 @@ namespace Banker.Controllers
         {
             (int id, _) = HttpContext.GetUserInfo();
 
-            var Transections = _helper.GetTransactionList(id);
+            var Transections = _transaction.GetTransactionList(id);
             
             return Json(new { data = Transections });
         }
@@ -60,7 +64,7 @@ namespace Banker.Controllers
         [Route("/Home/Transaction/Edit")]
         public JsonResult Edit(int id)
         {
-            var transection = _helper.GetTransaction(id);
+            var transection = _transaction.GetTransaction(id);
             return Json (transection);
 
         }
@@ -70,22 +74,18 @@ namespace Banker.Controllers
         {
             try
             {
-                string Query = $"UPDATE[dbo].[Transaction] SET [Source] = '{collect.Transection.Source}' ,[Type] = '{collect.Transection.Type}' ,[Updated_at] = GETDATE() ,[Updated_by] = '{collect.Transection.Name}' " +
-            $"WHERE OId = '{collect.Transection.OId}'";
-                int Uresult = _helper.DMLTransaction(Query);
+                int Uresult = _transaction.Transaction(collect);
                 if (Uresult > 0)
                 {
                     (int id, _) = HttpContext.GetUserInfo();
-                    string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
-                                    $",[Created_at],[Created_by]) VALUES ('{id}','{collect.Transection.TransId}','{collect.Transection.Name}',GETDATE(),'{collect.Transection.Amount}','{collect.Transection.Source}','{collect.Transection.TransactionType}','{collect.Transection.Type}','{"Edited"}',GETDATE(),'{collect.Transection.Name}')";
-                    int Iresult = _helper.DMLTransaction(Iquery);
+                    int Iresult = _audit.InsertEditAudit(collect,id);
                     if (Iresult > 0)
                     {
                         
                         CollectData Model = new CollectData
                         {
-                            Transections = _helper.GetTransactionList(id),
-                            User = _helper.GetUserById(id)
+                            Transections = _transaction.GetTransactionList(id),
+                            User = _user.GetUserById(id)
                         };
                         return View(Model);
                     }
@@ -113,17 +113,14 @@ namespace Banker.Controllers
         [Route("/Home/Transaction/Delete/{id}")]
         public IActionResult Delete(int id)
         {
-            var transection = _helper.GetTransaction(id);
+            var transection = _transaction.GetTransaction(id);
             try
-            {
-                string Query = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
-                                    $",[Created_at],[Created_by]) VALUES ('{transection.UserId}','{transection.TransId}','{transection.Name}',GETDATE(),'{transection.Amount}','{transection.Source}','{transection.TransactionType}','{transection.Type}','{"Deleted"}',GETDATE(),'{transection.Name}')";
-                
-                int Uresult = _helper.DMLTransaction(Query);
+            { 
+                int Uresult = _audit.InsertDeleteAudit(transection);
                 if (Uresult > 0)
                 {
-                    string Iquery = $"DELETE FROM [dbo].[Transaction]  WHERE OId = '{transection.OId}' ";
-                    int Iresult = _helper.DMLTransaction(Iquery);
+                    
+                    int Iresult = _transaction.DeleteTransaction(transection);
                     if (Iresult > 0)
                     {
                         return Json(new { success = true, message = "Transaction Deleted successful" });
@@ -160,7 +157,7 @@ namespace Banker.Controllers
             try
             {
                 UserViewModel uvm = new UserViewModel();
-                uvm = _helper.GetUserById(id);
+                uvm = _user.GetUserById(id);
                 if(wtvm.Amount <= 9)
                 {
                     ViewBag.Error = "You cannot withdraw less than 10$!";
@@ -185,26 +182,21 @@ namespace Banker.Controllers
                 {
                     var date = DateTime.Now;
                     string transId = date.ToString("yyyyMMdd-HHmmssfff");
-                    string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
-                        $"values ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}',GETDATE(),'{wtvm.Name}')";
+                    
                     //If user doesn't exists it inserts data into database
-                    int result = _helper.DMLTransaction(Query);
+                    int result = _transaction.Withdraw(wtvm, id, transId);
                     if (result > 0)
                     {
-                        string Uquery = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{wtvm.Name}' , Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
-                        int Uresult = _helper.DMLTransaction(Uquery);
+                        int Uresult = _user.UpdateWithdrawBalance(wtvm,id);
                         if (Uresult > 0)
                         {
-                            string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
-                                            $",[Created_at],[Created_by]) VALUES ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}','{"Added"}',GETDATE(),'{wtvm.Name}')";
-                            int Iresult = _helper.DMLTransaction(Iquery);
+                            int Iresult = _audit.InsertAddAudit(wtvm,id,transId);
                             if(Iresult > 0)
                             {
                                 _logger.LogInformation("Withdraw completed, balance ammount updated!");
                                 _logger.LogInformation("Redicted to Balance dashboard");
                                 return RedirectToRoute("balance"); //Redirects to Home accounts index view
                             }
-                            
                         }
                     }
                 }
@@ -233,7 +225,7 @@ namespace Banker.Controllers
             {
                 (int id, _) = HttpContext.GetUserInfo();
                 UserViewModel uvm = new UserViewModel();
-                uvm = _helper.GetUserById(id);
+                uvm = _user.GetUserById(id);
                 if (dtvm.Amount <= 9)
                 {
                     ViewBag.Error = "You cannot deposit less than 10$!";
@@ -242,19 +234,14 @@ namespace Banker.Controllers
                 }
                 var date = DateTime.Now;
                 string transId = date.ToString("yyyyMMdd-HHmmssfff");
-                string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
-                    $"values ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Deposit"}','{dtvm.Type}',GETDATE(),'{dtvm.Name}')";
                 //If user doesn't exists it inserts data into database
-                int result = _helper.DMLTransaction(Query);
+                int result = _transaction.Deposit(dtvm, id, transId);
                 if (result > 0)
                 {
-                    string Uquery = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{dtvm.Name}' ,Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{dtvm.Amount}') WHERE OId = '{id}'";
-                    int Uresult = _helper.DMLTransaction(Uquery);
+                    int Uresult = _user.UpdateDepositBalance(dtvm, id);
                     if (Uresult > 0)
                     {
-                        string Iquery = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
-                                           $",[Created_at],[Created_by]) VALUES ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Withdraw"}','{dtvm.Type}','{"Added"}',GETDATE(),'{dtvm.Name}')";
-                        int Iresult = _helper.DMLTransaction(Iquery);
+                        int Iresult = _audit.InsertAddAudit(dtvm, id, transId);
                         if (Iresult > 0)
                         {
                             _logger.LogInformation("Deposit completed, balance ammount updated!");

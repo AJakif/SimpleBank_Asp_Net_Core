@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Banker.Models\Banker.Models.csproj" />
+    <ProjectReference Include="..\BankerLibrary\BankerLibrary.csproj" />
   </ItemGroup>
 
 </Project>

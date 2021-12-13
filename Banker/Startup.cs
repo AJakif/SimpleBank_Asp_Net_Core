@@ -1,5 +1,5 @@
-
-using Banker.Helpers;
+using BankerLibrary.Repository;
+using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +31,11 @@ namespace Banker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ICommonHelper, CommonHelper>(); //
+            services.AddTransient<IUserRepository, UserRepository>(); //
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
+            services.AddTransient<IReportRepository, ReportRepository>();
+            services.AddTransient<ILoginHistoryRepository, LoginHistoryRepository>();
+            services.AddTransient<IAuditRepository, AuditRepository>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMvc().AddSessionStateTempDataProvider(); // service for session
