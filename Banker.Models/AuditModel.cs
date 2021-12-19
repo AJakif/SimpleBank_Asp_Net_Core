@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Banker.Models.ViewModels
+namespace Banker.Models
 {
-    public class Transection
+    public class AuditModel
     {
-        [Key]
+
+        [Required]
         public int OId { get; set; }
 
         [Required]
@@ -17,16 +18,12 @@ namespace Banker.Models.ViewModels
         public string TransId { get; set; }
 
         [Required]
-        [RegularExpression(@"^[a-zA-Z]+[ a-zA-Z-_]*$", ErrorMessage = "Use Characters only")]
         public string Name { get; set; }
-        
-        [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime Date { get; set; }
 
         [Required]
+        public String Date { get; set; }
 
-        [DataType(DataType.Currency)]
+        [Required]
         public decimal Amount { get; set; }
 
         [Required]
@@ -35,6 +32,12 @@ namespace Banker.Models.ViewModels
         [Required]
         public string TransactionType { get; set; }
 
+        [Required]
         public string Type { get; set; }
+
+        [Required]
+        public string LogType { get; set; }
+
+        public List<AuditModel> AuditList { get; set; }
     }
 }

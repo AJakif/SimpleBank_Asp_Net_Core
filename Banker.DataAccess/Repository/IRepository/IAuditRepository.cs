@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,17 +7,17 @@ namespace BankerLibrary.Repository.IRepository
 {
     public interface IAuditRepository
     {
-        AuditViewModel GetAudit();
+        AuditModel GetAudit();
 
-        AuditViewModel GetAuditType(string type);
+        AuditModel GetAuditType(string type);
 
-        AuditViewModel GetLogType(string type);
+        AuditModel GetLogType(string type);
 
-        AuditViewModel GetDate(string date);
-        int InsertEditAudit(CollectData collect, int id);
+        AuditModel GetDate(string date);
+        int InsertEditAudit(CollectDataModel collect, int id);
 
-        int InsertDeleteAudit(Transection transection);
+        int InsertDeleteAudit(TransactionModel transection);
 
-        int InsertAddAudit(Transection wtvm, int id, string transId);
+        int InsertAddAudit(TransactionModel wtvm, int id, string transId);
     }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Banker.Models.ViewModels
+namespace Banker.Models
 {
-    public class TransectionAudit
+    public class TransactionModel
     {
         [Key]
         public int OId { get; set; }
@@ -35,10 +35,6 @@ namespace Banker.Models.ViewModels
         [Required]
         public string TransactionType { get; set; }
 
-        [Required]
         public string Type { get; set; }
-
-        [Required]
-        public string LogType { get; set; }
     }
 }

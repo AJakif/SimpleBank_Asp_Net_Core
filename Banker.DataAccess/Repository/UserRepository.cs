@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ namespace BankerLibrary.Repository
             _logger = logger;
         }
 
-        public bool UserAlreadyExists(RegisterViewModel rvm)
+        public bool UserAlreadyExists(RegisterModel rvm)
         {
             string query = $"Select * from [User] where Name='{rvm.Name}'" + $"OR Email = '{rvm.Email}'";
             _logger.LogInformation("Entered in UserAlreadyExists..");
@@ -52,7 +52,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int Register(RegisterViewModel rvm)
+        public int Register(RegisterModel rvm)
         {
             //if user exists then returns to Account controller and redirects to register view
             string Query = "Insert into [User] (Name,Address,Gender,Role,Phone,Email,Password,Balance,Created_at,Created_by)" +
@@ -80,13 +80,13 @@ namespace BankerLibrary.Repository
 
         }
 
-        public UserViewModel GetUserByEmail(LoginViewModel lvm)
+        public UserModel GetUserByEmail(LoginModel lvm)
         {
             string query = $"select * from [User] where Email='{lvm.Email}' and Password='{lvm.Password}'";
             _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
 
             _logger.LogInformation("Entered in GetUserByEmail..");
-            UserViewModel user = new UserViewModel();
+            UserModel user = new UserModel();
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -123,10 +123,10 @@ namespace BankerLibrary.Repository
             return user;
         }
 
-        public UserViewModel GetUserById(int id)
+        public UserModel GetUserById(int id)
         {
             _logger.LogInformation("Entered in GetUserById..");
-            UserViewModel user = new UserViewModel();
+            UserModel user = new UserModel();
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -155,7 +155,7 @@ namespace BankerLibrary.Repository
             return user;
         }
 
-        public int UpdateWithdrawBalance(Transection wtvm, int id)
+        public int UpdateWithdrawBalance(TransactionModel wtvm, int id)
         {
             string Query = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{wtvm.Name}' , Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') - '{wtvm.Amount}') WHERE OId = '{id}'";
             _logger.LogInformation("Entered in DMLTransaction..");
@@ -181,7 +181,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int UpdateDepositBalance(Transection wtvm, int id)
+        public int UpdateDepositBalance(TransactionModel wtvm, int id)
         {
             string Query = $"UPDATE [User] SET Updated_at = GETDATE(),Updated_by= '{wtvm.Name}' , Balance = ((SELECT Balance FROM[User] WHERE OId = '{id}') + '{wtvm.Amount}') WHERE OId = '{id}'";
             _logger.LogInformation("Entered in DMLTransaction..");

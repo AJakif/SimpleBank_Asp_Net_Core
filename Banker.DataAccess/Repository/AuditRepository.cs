@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
@@ -21,7 +21,7 @@ namespace BankerLibrary.Repository
             _logger = logger;
         }
 
-        public int InsertEditAudit(CollectData collect,int id)
+        public int InsertEditAudit(CollectDataModel collect,int id)
         {
             string Query = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
                                     $",[Created_at],[Created_by]) VALUES ('{id}','{collect.Transection.TransId}','{collect.Transection.Name}',GETDATE(),'{collect.Transection.Amount}','{collect.Transection.Source}','{collect.Transection.TransactionType}','{collect.Transection.Type}','{"Edited"}',GETDATE(),'{collect.Transection.Name}')";
@@ -48,7 +48,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int InsertDeleteAudit(Transection transection)
+        public int InsertDeleteAudit(TransactionModel transection)
         {
             string Query = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
                                      $",[Created_at],[Created_by]) VALUES ('{transection.UserId}','{transection.TransId}','{transection.Name}',GETDATE(),'{transection.Amount}','{transection.Source}','{transection.TransactionType}','{transection.Type}','{"Deleted"}',GETDATE(),'{transection.Name}')";
@@ -75,7 +75,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int InsertAddAudit(Transection wtvm, int id, string transId)
+        public int InsertAddAudit(TransactionModel wtvm, int id, string transId)
         {
             string Query = $"INSERT INTO[dbo].[TansactionAudit] ([UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType]" +
                                              $",[Created_at],[Created_by]) VALUES ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}','{"Added"}',GETDATE(),'{wtvm.Name}')";
@@ -102,10 +102,10 @@ namespace BankerLibrary.Repository
 
         }
 
-        public AuditViewModel GetAudit()
+        public AuditModel GetAudit()
         {
             string query = $"Select * from [TansactionAudit] ORDER BY Date DESC";
-            List<AuditViewModel> avml = new List<AuditViewModel>();
+            List<AuditModel> avml = new List<AuditModel>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -120,7 +120,7 @@ namespace BankerLibrary.Repository
                         {
                             if (dataReader != null)
                             {
-                                AuditViewModel avm = new AuditViewModel()
+                                AuditModel avm = new AuditModel()
                                 {
                                     OId = Convert.ToInt32(dataReader["OId"]),
                                     UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -146,7 +146,7 @@ namespace BankerLibrary.Repository
                 connection.Close();
             }
 
-            AuditViewModel obj = new AuditViewModel
+            AuditModel obj = new AuditModel
             {
                 AuditList = avml
             };
@@ -154,11 +154,11 @@ namespace BankerLibrary.Repository
             return obj;
         }
 
-        public AuditViewModel GetAuditType(string type)
+        public AuditModel GetAuditType(string type)
         {
             string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
            $"FROM[dbo].[TansactionAudit] WHERE[TransactionType] = '{type}'";
-            List<AuditViewModel> avml = new List<AuditViewModel>();
+            List<AuditModel> avml = new List<AuditModel>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -173,7 +173,7 @@ namespace BankerLibrary.Repository
                         {
                             if (dataReader != null)
                             {
-                                AuditViewModel avm = new AuditViewModel()
+                                AuditModel avm = new AuditModel()
                                 {
                                     OId = Convert.ToInt32(dataReader["OId"]),
                                     UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -199,7 +199,7 @@ namespace BankerLibrary.Repository
                 connection.Close();
             }
 
-            AuditViewModel obj = new AuditViewModel
+            AuditModel obj = new AuditModel
             {
                 AuditList = avml
             };
@@ -207,11 +207,11 @@ namespace BankerLibrary.Repository
             return obj;
         }
 
-        public AuditViewModel GetLogType(string type)
+        public AuditModel GetLogType(string type)
         {
             string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
             $"FROM[dbo].[TansactionAudit] WHERE[LogType] = '{type}'";
-            List<AuditViewModel> avml = new List<AuditViewModel>();
+            List<AuditModel> avml = new List<AuditModel>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -226,7 +226,7 @@ namespace BankerLibrary.Repository
                         {
                             if (dataReader != null)
                             {
-                                AuditViewModel avm = new AuditViewModel()
+                                AuditModel avm = new AuditModel()
                                 {
                                     OId = Convert.ToInt32(dataReader["OId"]),
                                     UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -252,7 +252,7 @@ namespace BankerLibrary.Repository
                 connection.Close();
             }
 
-            AuditViewModel obj = new AuditViewModel
+            AuditModel obj = new AuditModel
             {
                 AuditList = avml
             };
@@ -260,11 +260,11 @@ namespace BankerLibrary.Repository
             return obj;
         }
 
-        public AuditViewModel GetDate(string date)
+        public AuditModel GetDate(string date)
         {
             string query = $"SELECT[OId] ,[UserId],[TransId],[Name],[Date],[Amount],[Source],[TransactionType],[Type],[LogType] " +
             $"FROM[dbo].[TansactionAudit] WHERE CONVERT(VARCHAR(10), [Date], 23) = '{date}'";
-            List<AuditViewModel> avml = new List<AuditViewModel>();
+            List<AuditModel> avml = new List<AuditModel>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -279,7 +279,7 @@ namespace BankerLibrary.Repository
                         {
                             if (dataReader != null)
                             {
-                                AuditViewModel avm = new AuditViewModel()
+                                AuditModel avm = new AuditModel()
                                 {
                                     OId = Convert.ToInt32(dataReader["OId"]),
                                     UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -305,7 +305,7 @@ namespace BankerLibrary.Repository
                 connection.Close();
             }
 
-            AuditViewModel obj = new AuditViewModel
+            AuditModel obj = new AuditModel
             {
                 AuditList = avml
             };

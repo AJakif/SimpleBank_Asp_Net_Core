@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Banker.Models.ViewModels.ReportModels
+namespace Banker.Models.ReportModels
 {
     public class YearlyDepositCatViewModel
     {

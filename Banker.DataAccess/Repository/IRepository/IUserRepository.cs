@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,16 +7,16 @@ namespace BankerLibrary.Repository.IRepository
 {
     public interface IUserRepository
     {
-        bool UserAlreadyExists(RegisterViewModel rvm);
+        bool UserAlreadyExists(RegisterModel rvm);
 
-        int Register(RegisterViewModel rvm);
+        int Register(RegisterModel rvm);
 
-        UserViewModel GetUserByEmail(LoginViewModel lvm);
+        UserModel GetUserByEmail(LoginModel lvm);
 
-        UserViewModel GetUserById(int id);
+        UserModel GetUserById(int id);
 
-        int UpdateWithdrawBalance(Transection wtvm, int id);
+        int UpdateWithdrawBalance(TransactionModel wtvm, int id);
 
-        int UpdateDepositBalance(Transection wtvm, int id);
+        int UpdateDepositBalance(TransactionModel wtvm, int id);
     }
 }

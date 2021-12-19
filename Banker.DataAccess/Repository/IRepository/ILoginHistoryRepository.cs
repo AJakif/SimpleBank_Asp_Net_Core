@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,8 +7,8 @@ namespace BankerLibrary.Repository.IRepository
 {
     public interface ILoginHistoryRepository
     {
-        int LoginHistory(UserViewModel userDetails);
+        int LoginHistory(UserModel userDetails);
 
-        HistoryViewModel GetHistory(int id);
+        HistoryModel GetHistory(int id);
     }
 }

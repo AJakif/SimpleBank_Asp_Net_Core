@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Banker.BusinessLayer\Banker.BusinessLayer.csproj" />
     <ProjectReference Include="..\Banker.DataAccess\Banker.DataAccess.csproj" />
   </ItemGroup>
 

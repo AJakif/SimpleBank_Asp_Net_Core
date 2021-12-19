@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Banker.Models.ViewModels.ReportModels
+namespace Banker.Models.ReportModels
 {
-    public class CurrentMonthWithdrawViewModel
+    public class CurrentMonthDepositViewModel
     {
         public decimal Total { get; set; }
         public string Remark { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Banker.Models;
-using Banker.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

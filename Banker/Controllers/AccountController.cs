@@ -1,5 +1,5 @@
 ﻿using Banker.Extensions;
-using Banker.Models.ViewModels;
+using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -42,7 +42,7 @@ namespace Banker.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterViewModel rvm)
+        public IActionResult Register(RegisterModel rvm)
         {
             _logger.LogInformation("The Register Post methhod has been called");
             try
@@ -82,12 +82,12 @@ namespace Banker.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>  Login(LoginViewModel lvm)
+        public async Task<IActionResult>  Login(LoginModel lvm)
         {
             try
             {
                    
-                    UserViewModel userDetails = _user.GetUserByEmail(lvm);
+                    UserModel userDetails = _user.GetUserByEmail(lvm);
                     _logger.LogInformation($"Userdetails '{userDetails}'");
 
                     if (userDetails != null && userDetails.Email != null) //all data should be null checked
@@ -153,7 +153,7 @@ namespace Banker.Controllers
 
             _logger.LogInformation("The Login Dashboard page has been accessed");
 
-            HistoryViewModel hvm = _login.GetHistory(id);
+            HistoryModel hvm = _login.GetHistory(id);
             return View(hvm);
         }
 

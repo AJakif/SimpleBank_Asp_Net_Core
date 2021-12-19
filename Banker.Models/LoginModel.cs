@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Banker.Models.ViewModels
+namespace Banker.Models
 {
-    public class LoginViewModel
+    public class LoginModel
     {
         [Key]
         public int OId { get; set; }

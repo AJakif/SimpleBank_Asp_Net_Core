@@ -1,5 +1,5 @@
 ﻿using Banker.Extensions;
-using Banker.Models.ViewModels;
+using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -38,7 +38,7 @@ namespace Banker.Controllers
         public IActionResult Balance()
         {
             (int id, _) = HttpContext.GetUserInfo();
-            CollectData Model = new CollectData
+            CollectDataModel Model = new CollectDataModel
             {
                 Transections = _transaction.GetTransactionList(id),
                 User = _user.GetUserById(id)
@@ -70,11 +70,11 @@ namespace Banker.Controllers
         }
 
         [HttpPost]
-        public IActionResult Balance(CollectData collect)
+        public IActionResult Balance(CollectDataModel collect)
         {
             try
             {
-                int Uresult = _transaction.Transaction(collect);
+                int Uresult = _transaction.UpdateTransaction(collect);
                 if (Uresult > 0)
                 {
                     (int id, _) = HttpContext.GetUserInfo();
@@ -82,7 +82,7 @@ namespace Banker.Controllers
                     if (Iresult > 0)
                     {
                         
-                        CollectData Model = new CollectData
+                        CollectDataModel Model = new CollectDataModel
                         {
                             Transections = _transaction.GetTransactionList(id),
                             User = _user.GetUserById(id)
@@ -151,12 +151,12 @@ namespace Banker.Controllers
         }
 
         [HttpPost]
-        public IActionResult Withdraw( Transection wtvm)
+        public IActionResult Withdraw( TransactionModel wtvm)
         {
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
             try
             {
-                UserViewModel uvm = new UserViewModel();
+                UserModel uvm = new UserModel();
                 uvm = _user.GetUserById(id);
                 if(wtvm.Amount <= 9)
                 {
@@ -219,12 +219,12 @@ namespace Banker.Controllers
         }
 
         [HttpPost]
-        public IActionResult Deposit(Transection dtvm)
+        public IActionResult Deposit(TransactionModel dtvm)
         {
             try
             {
                 (int id, _) = HttpContext.GetUserInfo();
-                UserViewModel uvm = new UserViewModel();
+                UserModel uvm = new UserModel();
                 uvm = _user.GetUserById(id);
                 if (dtvm.Amount <= 9)
                 {

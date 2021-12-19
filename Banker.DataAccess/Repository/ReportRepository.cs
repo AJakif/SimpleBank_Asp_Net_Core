@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels.ReportModels;
+﻿using Banker.Models.ReportModels;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;

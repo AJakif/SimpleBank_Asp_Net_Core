@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ namespace BankerLibrary.Repository
             _config = config;
             _logger = logger;
         }
-        public int LoginHistory(UserViewModel userDetails)
+        public int LoginHistory(UserModel userDetails)
         {
             string Query = "Insert into [LoginHistory] (UserId,DateTime,Created_at,Created_by)" + $"values ('{userDetails.OId}',GETDATE(),GETDATE(),(SELECT Name FROM[User] WHERE OId = '{userDetails.OId}'))";
             _logger.LogInformation("Entered in DMLTransaction..");
@@ -45,9 +45,9 @@ namespace BankerLibrary.Repository
             }
         }
 
-        public HistoryViewModel GetHistory(int id)
+        public HistoryModel GetHistory(int id)
         {
-            List<HistoryViewModel> historyList = new List<HistoryViewModel>();
+            List<HistoryModel> historyList = new List<HistoryModel>();
 
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -64,7 +64,7 @@ namespace BankerLibrary.Repository
                         {
                             if (dataReader != null)
                             {
-                                HistoryViewModel history = new HistoryViewModel
+                                HistoryModel history = new HistoryModel
                                 {
                                     OId = Convert.ToInt32(dataReader["OId"]),
                                     UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -83,7 +83,7 @@ namespace BankerLibrary.Repository
                 connection.Close();
             }
 
-            HistoryViewModel obj = new HistoryViewModel
+            HistoryModel obj = new HistoryModel
             {
                 HistoryList = historyList
             };

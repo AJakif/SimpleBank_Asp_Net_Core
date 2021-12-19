@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels.ReportModels;
+﻿using Banker.Models.ReportModels;
 using System;
 using System.Collections.Generic;
 using System.Text;

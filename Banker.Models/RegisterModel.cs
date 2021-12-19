@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Banker.Models.ViewModels
+namespace Banker.Models
 {
-    public class RegisterViewModel
+    public class RegisterModel
     {
         [Required]
         [RegularExpression(@"^[a-zA-Z]+[ a-zA-Z-_]*$", ErrorMessage = "Use Characters only")]

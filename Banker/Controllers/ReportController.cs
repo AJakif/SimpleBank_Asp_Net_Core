@@ -1,6 +1,5 @@
 ﻿using Banker.Extensions;
-using Banker.Models.ViewModels;
-using Banker.Models.ViewModels.ReportModels;
+using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ namespace Banker.Controllers
         public IActionResult Report()
         {
             (int id, _) = HttpContext.GetUserInfo();
-            CollectData Model = new CollectData
+            CollectDataModel Model = new CollectDataModel
             {
                 
                 Transections = _transaction.GetTransactionList(id),

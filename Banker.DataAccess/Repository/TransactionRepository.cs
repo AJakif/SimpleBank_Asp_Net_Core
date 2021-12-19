@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -20,9 +20,9 @@ namespace BankerLibrary.Repository
             _logger = logger;
         }
 
-        public List<Transection> GetTransactionList(int id)
+        public List<TransactionModel> GetTransactionList(int id)
         {
-            List<Transection> TransactionList = new List<Transection>();
+            List<TransactionModel> TransactionList = new List<TransactionModel>();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -36,7 +36,7 @@ namespace BankerLibrary.Repository
                     {
                         while (dataReader.Read()) //make it single user
                         {
-                            Transection trans = new Transection
+                            TransactionModel trans = new TransactionModel
                             {
                                 OId = Convert.ToInt32(dataReader["OId"]),
                                 UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -64,9 +64,9 @@ namespace BankerLibrary.Repository
             return (TransactionList);
         }
 
-        public Transection GetTransaction(int id)
+        public TransactionModel GetTransaction(int id)
         {
-            CollectData collect = new CollectData();
+            CollectDataModel collect = new CollectDataModel();
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -81,7 +81,7 @@ namespace BankerLibrary.Repository
                     {
                         while (dataReader.Read()) //make it single user
                         {
-                            Transection t = new Transection
+                            TransactionModel t = new TransactionModel
                             {
                                 OId = Convert.ToInt32(dataReader["OId"]),
                                 UserId = Convert.ToInt32(dataReader["UserId"]),
@@ -109,7 +109,7 @@ namespace BankerLibrary.Repository
             return (collect.Transection);
         }
 
-        public int Transaction(CollectData collect)
+        public int UpdateTransaction(CollectDataModel collect)
         {
             string Query = $"UPDATE[dbo].[Transaction] SET [Source] = '{collect.Transection.Source}' ,[Type] = '{collect.Transection.Type}' ,[Updated_at] = GETDATE() ,[Updated_by] = '{collect.Transection.Name}' " +
             $"WHERE OId = '{collect.Transection.OId}'";
@@ -136,7 +136,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int DeleteTransaction(Transection transection)
+        public int DeleteTransaction(TransactionModel transection)
         {
             string Query = $"DELETE FROM [dbo].[Transaction]  WHERE OId = '{transection.OId}' ";
             _logger.LogInformation("Entered in DMLTransaction..");
@@ -162,7 +162,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int Withdraw(Transection wtvm, int id, string transId)
+        public int Withdraw(TransactionModel wtvm, int id, string transId)
         {
             string Query ="Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
                         $"values ('{id}','{transId}','{wtvm.Name}',GETDATE(),'{wtvm.Amount}','{wtvm.Source}','{"Withdraw"}','{wtvm.Type}',GETDATE(),'{wtvm.Name}')";
@@ -189,7 +189,7 @@ namespace BankerLibrary.Repository
 
         }
 
-        public int Deposit(Transection dtvm, int id, string transId)
+        public int Deposit(TransactionModel dtvm, int id, string transId)
         {
             string Query = "Insert into [Transaction] (UserId,TransId,Name,Date,Amount,Source,TransactionType,Type,Created_at,Created_by)" +
                     $"values ('{id}','{transId}','{dtvm.Name}',GETDATE(),'{dtvm.Amount}','{dtvm.Source}','{"Deposit"}','{dtvm.Type}',GETDATE(),'{dtvm.Name}')";

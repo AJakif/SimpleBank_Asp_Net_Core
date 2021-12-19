@@ -1,4 +1,4 @@
-﻿using Banker.Models.ViewModels;
+﻿using Banker.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,16 +7,16 @@ namespace BankerLibrary.Repository.IRepository
 {
     public interface ITransactionRepository
     {
-        List<Transection> GetTransactionList(int id);
+        List<TransactionModel> GetTransactionList(int id);
 
-        Transection GetTransaction(int id);
+        TransactionModel GetTransaction(int id);
 
-        int Transaction(CollectData collect);
+        int UpdateTransaction(CollectDataModel collect);
 
-        int DeleteTransaction(Transection transection);
+        int DeleteTransaction(TransactionModel transection);
 
-        int Withdraw(Transection wtvm, int id, string transId);
+        int Withdraw(TransactionModel wtvm, int id, string transId);
 
-        int Deposit(Transection dtvm, int id, string transId);
+        int Deposit(TransactionModel dtvm, int id, string transId);
     }
 }
