@@ -1,4 +1,4 @@
-﻿@model Banker.Models.ViewModels.CollectData;
+﻿@model Banker.Models.CollectDataModel;
 @{
     ViewData["Title"] = "Report";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -31,6 +31,7 @@
         <input type="radio" name="options" id="option2" onchange="HandleChange()"> Yearly
     </label>
 </div>
+    <a class="float-right btn btn-primary" asp-controller="Report" asp-action="GenarateReport">Genarate Report</a>
     <br />
     <br />
 <div id="report"></div>

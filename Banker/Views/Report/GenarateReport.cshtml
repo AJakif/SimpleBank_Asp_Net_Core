@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewData["Title"] = "GenarateReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class=" backgroundWhite col-lg">
+        <br />
+        <button class="ignoreForPdf float-right btn btn-danger" onclick="pdfPrint()">Print Report</button>
+    </div>
+</div>
+<div class="row" id="report">
+        <div class=" border backgroundWhite col-lg">
+            <h1 class="text-center text-primary">Monhtly Report</h1>
+            <br />
+            <div class="row text-center">
+                <div class="col-4">
+                    <b>User Name :</b><input class="border-0" readonly id="name" />
+                </div>
+                <div class="col-4">
+                    <b>Balance :</b><input class="border-0" readonly id="balance" />
+                </div>
+            </div>
+
+            <br />
+            <br />
+            <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm text-center">Month</th>
+                        <th class="th-sm text-center">Total Withdraw Amount</th>
+                        <th class="th-sm text-center">Total Deposit Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="tableData">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        <script src="~/js/reportGenarate.js"></script>
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+

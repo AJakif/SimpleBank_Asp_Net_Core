@@ -1,3 +1,7 @@
+using Banker.DataAccess.Repository;
+using Banker.DataAccess.Repository.IRepository;
+using Banker.Manager;
+using Banker.Manager.IManager;
 using BankerLibrary.Repository;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -36,6 +40,9 @@ namespace Banker
             services.AddTransient<IReportRepository, ReportRepository>();
             services.AddTransient<ILoginHistoryRepository, LoginHistoryRepository>();
             services.AddTransient<IAuditRepository, AuditRepository>();
+            services.AddTransient<IReportGenarateRepository, ReportGenarateRepository>();
+            services.AddTransient<IReportGenarateManager, ReportGenarateManager>();
+            //
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMvc().AddSessionStateTempDataProvider(); // service for session
@@ -52,6 +59,7 @@ namespace Banker
                     options.Cookie.Name = "Bank";
                 
                 });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -129,6 +137,11 @@ namespace Banker
                     name: "report",
                     pattern: "Home/Report",
                     defaults: new { controller = "Report", action = "Report", });
+
+                endpoints.MapControllerRoute(
+                    name: "genarateReport",
+                    pattern: "Home/Report/Genarate",
+                    defaults: new { controller = "Report", action = "GenarateReport", });
 
                 endpoints.MapControllerRoute(
                     name: "audit",

@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-    $('.dataTables_length').addClass('bs-select');
     $.ajax({
         type: 'GET',
         url: '/Home/Audit/GetAll',
@@ -46,9 +45,11 @@ function loadTableData(auditData) {
 
 
             tableBody.innerHTML = dataHtml;
-            $('#dtBasicExample').DataTable();
         }
     }
+
+    $('#dtBasicExample').DataTable();
+    $('.dataTables_length').addClass('bs-select');
     
 }
 

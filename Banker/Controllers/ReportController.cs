@@ -1,4 +1,5 @@
 ﻿using Banker.Extensions;
+using Banker.Manager.IManager;
 using Banker.Models;
 using BankerLibrary.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
@@ -19,12 +20,14 @@ namespace Banker.Controllers
         private readonly ITransactionRepository _transaction;
         private readonly IUserRepository _user;
         private readonly IReportRepository _report;
+        private readonly IReportGenarateManager _reportGenarator;
 
-        public ReportController(ITransactionRepository transaction, IUserRepository user, IReportRepository report)
+        public ReportController(ITransactionRepository transaction, IUserRepository user, IReportRepository report, IReportGenarateManager reportGenarator)
         {
             _transaction = transaction;
             _user = user;
             _report = report;
+            _reportGenarator = reportGenarator;
         }
 
         [Authorize]
@@ -125,6 +128,23 @@ namespace Banker.Controllers
         {
             (int id, _) = HttpContext.GetUserInfo(); //try-catch
             return Json(new { FirstList = _report.MyMWithdraw(id), SecondList = _report.MyYWithdraw(id) });
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("/Home/Report/Genarate")]
+        public IActionResult GenarateReport()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("/Home/Report/Monthly/Statement")]
+        public JsonResult GenarateStatementReport()
+        {
+            (int id, _) = HttpContext.GetUserInfo(); //try-catch
+            return Json(_reportGenarator.ReportGet(id));
         }
 
     }
